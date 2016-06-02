@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>play / pause</title>
+  </head>
+  <body>
+    <webview id="wv" src="https://soundcloud.com/jonwayne"
+             style="display:inline-flex; width:640px; height:480px"
+             autosize="on"
+             minwidth="576" minheight="432"
+             plugins
+             allowpopups
+             disablewebsecuritygit
+    ></webview>
+    <div class="indicator"></div>
+    <br>
+    We are using node <script>document.write(process.versions.node)</script>,
+    Chrome <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>.
+
+    <script>
+      var webview = document.getElementById('wv');
+      var indicator = document.querySelector('.indicator');
+      var contents
+      function onload(){
+        webview = document.getElementById('wv');
+        indicator = document.querySelector('.indicator');
+
+        var loadstart = function() {
+          indicator.innerText = 'loading...';
+        };
+
+        var loadstop = function() {
+          indicator.innerText = '';
+        };
+
+        webview.addEventListener('did-start-loading', loadstart);
+        webview.addEventListener('did-stop-loading', loadstop);
+
+        webview.addEventListener('dom-ready', function(){
+          webview.openDevTools();
+          console.log(webview)
+          contents = webview.getWebContents()
+          console.log(contents)
+          webview.send('ping');
+
+        });
+
+        // In embedder page.
+        webview.addEventListener('ipc-message', function(event){
+          console.log(event.channel);
+        });
+      };
+
+      onload();
+    </script>
+    <script>
+      require('electron').ipcRenderer.on('playpause', (event, message) => {
+        console.log(message);
+        webview.executeJavaScript('console.log("playpause")')
+      });
+    </script>
+  </body>
+</html>
