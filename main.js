@@ -21,4 +21,6 @@ app.on('ready', () => {
   let browserWindow = new BrowserWindow(settings.browserWindow);
   browserWindow.loadUrl('file://' + __dirname + '/render/index.html');
   keybindings.init(browserWindow);
+
+  browserWindow.openDevTools()
 });
