@@ -3,25 +3,6 @@ var app = require('app');
 var BrowserWindow = require('browser-window');
 var globalShortcut = require('global-shortcut');
 var path = require('path');
-// In main process.
-var ipcMain = require('electron').ipcMain;
-ipcMain.on('asynchronous-message', (event, arg) => {
-  console.log(arg);  // prints "ping"
-  event.sender.send('asynchronous-reply', 'pong');
-});
-
-ipcMain.on('synchronous-message', (event, arg) => {
-  console.log(arg);  // prints "ping"
-  event.returnValue = 'pong';
-});
-
-// Report any crashes to Electron's servers
-require('crash-reporter').start();
-
-// In guest page.
-ipcMain.on('ping', () => {
-  ipcMain.sendToHost('pong');
-});
 
 var ppapi_flash_path;
 // Specify flash path.
@@ -40,8 +21,6 @@ app.commandLine.appendSwitch('ppapi-flash-path', ppapi_flash_path);
 
 app.commandLine.appendSwitch('ppapi-flash-version', '18.0.0.203');
 
-
-
 // When all Windows are closed
 app.on('window-all-closed', function handleWindowsClosed () {
   // If we are not on OS X, exit
@@ -56,7 +35,6 @@ app.on('window-all-closed', function handleWindowsClosed () {
 
 // When Electron is done loading
 app.on('ready', function handleReady () {
-  browserWindow = new BrowserWindow(windowOpts);
 
   // Create our browser window for google.com
   var windowOpts = {
@@ -65,9 +43,6 @@ app.on('ready', function handleReady () {
   };
   browserWindow = new BrowserWindow(windowOpts);
   browserWindow.loadUrl('file://' + __dirname + '/index.html');
-  browserWindow.webContents.on('did-finish-load', () => {
-    browserWindow.webContents.send('ping', 'whoooooooh!');
-  });
 
   // Load our media keys
   // Copied from https://gist.github.com/twolfson/0a03820e27583cc9ad6e

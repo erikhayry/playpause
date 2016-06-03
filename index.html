@@ -11,7 +11,8 @@
              minwidth="576" minheight="432"
              plugins
              allowpopups
-             disablewebsecuritygit
+             disablewebsecurity
+             preload="./node_modules/electron-safe-ipc/guest-bundle.js"
     ></webview>
     <div class="indicator"></div>
     <br>
@@ -40,16 +41,18 @@
 
         webview.addEventListener('dom-ready', function(){
           webview.openDevTools();
-          console.log(webview)
-          contents = webview.getWebContents()
-          console.log(contents)
-          webview.send('ping');
-
         });
 
-        // In embedder page.
-        webview.addEventListener('ipc-message', function(event){
-          console.log(event.channel);
+        webview.addEventListener('console-message', function(e){
+          console.log(e)
+        });
+
+        webview.addEventListener('media-started-playing', function(e){
+          console.log(e)
+        });
+
+        webview.addEventListener('media-paused', function(e){
+          console.log(e)
         });
       };
 
@@ -58,7 +61,12 @@
     <script>
       require('electron').ipcRenderer.on('playpause', (event, message) => {
         console.log(message);
-        webview.executeJavaScript('console.log("playpause")')
+        webview.executeJavaScript('electronSafeIpc.send("fromRenderer", document.querySelectorAll("*"), "a2");')
+        //webview.executeJavaScript("console.log(document.querySelectorAll('button.playControl')[0].className); document.querySelectorAll('button.playControl')[0].click()")
+      });
+
+      require("electron-safe-ipc/host-webview").on("fromRenderer", function (a, b) {
+        console.log("fromRenderer received", a, b);
       });
     </script>
   </body>
