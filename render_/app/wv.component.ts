@@ -1,5 +1,8 @@
 import { ViewChild, ViewChildren, Component, QueryList, ElementRef } from '@angular/core';
 
+declare var ppRender: any;
+
+
 @Component({
   selector: 'wv',
   template: `
@@ -21,12 +24,12 @@ import { ViewChild, ViewChildren, Component, QueryList, ElementRef } from '@angu
 
 export class WebviewComponent{
   @ViewChild('wv') input:ElementRef;
-
     ngAfterViewInit() {
       console.log(this.input.nativeElement);
       let _webview = this.input.nativeElement;
-      window.webview = _webview;
-      
+      window.RENDER.setWv(_webview)
+
+        
       let _loadstart = function() {
         console.log('loading...');
       };
