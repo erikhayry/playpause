@@ -2,7 +2,7 @@
 
 module.exports = {
     browserWindow: {
-        height: 920,
-        width: 1024
+        height: 1100,
+        width: 1600
     }
 };

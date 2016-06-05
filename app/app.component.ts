@@ -4,7 +4,6 @@ import {WebviewComponent} from "./wv.component";
 @Component({
     selector: 'my-app',
     template: `
-        <h1>play / pause</h1>
         <wv></wv>
     `,
     directives: [WebviewComponent]

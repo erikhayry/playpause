@@ -1,4 +1,6 @@
 export interface Render{
   on(event:String, callback:any):any
-  setWv(webview:any):void
+  setWebView(webview:any):void
+  getStations():Array<any>
+  setStation(station:any)
 }

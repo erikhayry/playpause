@@ -1,40 +1,43 @@
 import { ViewChild, ViewChildren, Component, QueryList, ElementRef } from '@angular/core';
 import {PPWindowImpl} from "../domain/window";
 
-declare var ppRender: any;
-
-
 @Component({
   selector: 'wv',
   template: `
-    {{wvSrc}}
-    <ul>
-        <li><button (click)="setSrc('https://soundcloud.com/jonwayne')">soundcloud</button></li>
-        <li><button (click)="setSrc('https://www.bbc.co.uk/radio/player/bbc_6music')">bbc</button></li>
-        <li><button (click)="setSrc('https://play.spotify.com/browse')">spotify</button></li>
-    </ul>
-    <div *ngIf="wvSrc != ''">
-      <webview 
-               #wv
-               id="wv"
-               style="display:inline-flex; width:640px; height:480px"
-               autosize="on"
-               minwidth="576" minheight="432"
-               plugins
-               allowpopups
-               disablewebsecurity
-      ></webview>    
-    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 sidebar">
+          <ul class="nav nav-sidebar" >
+              <li *ngFor="#station of stations">
+                <button class="btn btn-block btn-primary" (click)="setStation(station)">{{station.name}}</button>
+              </li>
+          </ul>
+        </div>        
+        <div class="col-sm-9 main" *ngIf="wvSrc != ''">
+          <webview 
+                   #wv
+                   id="wv"
+                   style="display:inline-flex; width:100%; height:100%"
+                   autosize="on"
+                   plugins
+                   allowpopups
+                   disablewebsecurity
+          ></webview>    
+          </div>
+        </div>
+     </div>   
   `
 })
 
 export class WebviewComponent{
   _webview:any;
   _window:PPWindowImpl;
-  wvSrc:String;
+  stations:Array<any>;
+  station:any;
 
     constructor() {
       this._window = (<PPWindowImpl>window);
+      this.stations = this._window.render.getStations();
     }
 
     @ViewChild('wv') input:ElementRef;
@@ -42,7 +45,7 @@ export class WebviewComponent{
       console.log(this.input.nativeElement);
       this._webview = this.input.nativeElement;
 
-      this._window.render.setWv(this._webview)
+      this._window.render.setWebView(this._webview)
       this._window.render.on('playpause', function(e){
         console.log('onPlayPause', e)
       });
@@ -52,6 +55,7 @@ export class WebviewComponent{
       };
 
       let _loadstop = function() {
+        console.log('_loadstop');
       };
 
       this._webview.addEventListener('did-start-loading', _loadstart);
@@ -76,8 +80,9 @@ export class WebviewComponent{
       });
     }
 
-  setSrc = (src) =>{
-    this.wvSrc = src;
-    this._webview.src = src;
+  setStation = (station:any) =>{
+    this._webview.src = station.url;
+    this.station = station;
+    this._window.render.setStation(station)
   }
 }
