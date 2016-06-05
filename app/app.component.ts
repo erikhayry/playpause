@@ -7,7 +7,7 @@ import {WebviewComponent} from "./wv.component";
         <h1>play / pause</h1>
         <wv></wv>
     `,
-  directives: [WebviewComponent]
+    directives: [WebviewComponent]
 })
 
 export class AppComponent { }

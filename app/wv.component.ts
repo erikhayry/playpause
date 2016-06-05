@@ -1,4 +1,5 @@
 import { ViewChild, ViewChildren, Component, QueryList, ElementRef } from '@angular/core';
+import {PPWindowImpl} from "../domain/window";
 
 declare var ppRender: any;
 
@@ -29,20 +30,25 @@ declare var ppRender: any;
 
 export class WebviewComponent{
   _webview:any;
+  _window:PPWindowImpl;
   wvSrc:String;
 
-  @ViewChild('wv') input:ElementRef;
+    constructor() {
+      this._window = (<PPWindowImpl>window);
+    }
+
+    @ViewChild('wv') input:ElementRef;
     ngAfterViewInit() {
       console.log(this.input.nativeElement);
       this._webview = this.input.nativeElement;
 
-      window.RENDER.setWv(this._webview)
-      window.RENDER.subscribe('playpause', function(e){
+      this._window.render.setWv(this._webview)
+      this._window.render.on('playpause', function(e){
         console.log('onPlayPause', e)
       });
 
       let _loadstart = function() {
-        console.log('loading...');
+        console.log('loading');
       };
 
       let _loadstop = function() {
