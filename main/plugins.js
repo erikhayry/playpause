@@ -1,7 +1,9 @@
 "use strict";
 
 let _init = (app, path) =>{
-    let _ppapi_flash_path;
+  console.log('main > plugins.init', app, path);
+
+  let _ppapi_flash_path;
     if(process.platform  == 'win32'){
         _ppapi_flash_path = path.join(__dirname, 'plugins/pepflashplayer.dll');
     } else if (process.platform == 'linux') {

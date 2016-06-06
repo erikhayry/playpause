@@ -12,12 +12,14 @@ plugins.init(app, path);
 
 //Events
 app.on('window-all-closed', () => {
+  console.log('main: on window-all-closed');
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 app.on('ready', () => {
+  console.log('main: on ready');
   let browserWindow = new BrowserWindow(settings.browserWindow);
   browserWindow.loadUrl('file://' + __dirname + '/index.html');
   keybindings.init(browserWindow);

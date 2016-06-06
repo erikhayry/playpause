@@ -3,6 +3,7 @@
 const globalShortcut = require('global-shortcut');
 
 let _init = (browserWindow) => {
+    console.log('main > keybindings.init', browserWindow);
     // Load our media keys
     // Copied from https://gist.github.com/twolfson/0a03820e27583cc9ad6e
     var registered = globalShortcut.register('medianexttrack', function () {

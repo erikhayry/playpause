@@ -1,4 +1,5 @@
-module.exports = [
+import {DbItem} from "../domain/dbItem";
+let db:Array<DbItem> = [
   {
     name: 'BBC 6',
     url: 'https://www.bbc.co.uk/radio/player/bbc_6music',
@@ -24,3 +25,5 @@ module.exports = [
     }
   }
 ];
+
+module.exports = db;
