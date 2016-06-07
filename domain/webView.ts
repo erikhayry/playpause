@@ -10,5 +10,6 @@ export interface WebView{
   executeJavaScript(script:String):void
   addEventListener(event:String, callback:WebViewEventCallback):any
   openDevTools():void
+  getTitle():string
   src:String
 }

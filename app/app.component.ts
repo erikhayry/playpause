@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, provide} from '@angular/core';
 import {WebviewComponent} from "./wv.component";
 
 @Component({
