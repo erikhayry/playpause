@@ -1,5 +1,5 @@
-import {DbItem} from "../domain/dbItem";
-let db:Array<DbItem> = [
+import {Station} from "../domain/station";
+let db:Array<Station> = [
   {
     name: 'BBC 6',
     url: 'https://www.bbc.co.uk/radio/player/bbc_6music',

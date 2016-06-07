@@ -1,4 +1,4 @@
 export interface Subscriber {
-  publish(topic:String, info:any)
-  on(topic:String, listener:any)
+  publish(topic:string, info:any):void
+  on(topic:string, listener:any):any
 }
