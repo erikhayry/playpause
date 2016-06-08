@@ -1,8 +1,6 @@
 import {ButtonPath, Station} from "../domain/station";
 
-let Utils = () => {
-
-
+let Utils = (() => {
 
   let _getElement = (path:ButtonPath) => {
     if(path.type === 'selector'){
@@ -18,6 +16,7 @@ let Utils = () => {
     return true;
   };
 
+
   return {
     click(station:Station):string{
       return _getElement(station.buttons.play) + '.click()'
@@ -31,8 +30,10 @@ let Utils = () => {
         return 'document.querySelectorAll("' + playBtnEl.className +'")[0].click()'
       }
     },
-    getElement: _getElement
+    getElement(path:ButtonPath){
+      return _getElement(path)
+    }
   }
-};
+})();
 
 module.exports = Utils;

@@ -17,7 +17,7 @@ let render:Render = (function () {
   let _webView:WebView;
   let _subscriber = new subscriber();
   let _station:Station;
-
+  
   //Events
   electron.ipcRenderer.on('playpause', (event:IpcRendererEvent) => {
     console.log('render on playpause', event);
