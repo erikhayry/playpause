@@ -8,8 +8,9 @@ let render:Render = (function () {
   console.log('render');
 
   let electron:Electron = require('electron');
-  //let safeIPC:SafeIPC = require("electron-safe-ipc/host-webview");
+  let safeIPC:SafeIPC = require("electron-safe-ipc/host-webview");
   let fs = require('fs');
+  let utils = require('./js/render/utils');
   let subscriber = require('./js/render/subscriber');
   let db = require('./js/render/db');
 
@@ -21,22 +22,26 @@ let render:Render = (function () {
   electron.ipcRenderer.on('playpause', (event:IpcRendererEvent) => {
     console.log('render on playpause', event);
 
+    //TODO check if injected
     _webView.executeJavaScript(fs.readFileSync('./node_modules/electron-safe-ipc/guest-bundle.js').toString());
     _webView.executeJavaScript('console.log("guest > on playpause")');
-    _webView.executeJavaScript('electronSafeIpc.send("fromRenderer", console.log("guest > on playpause"));');
 
     if(_station){
-      _webView.executeJavaScript(_station.buttons.play)
+      if(_station.buttons.play !== _station.buttons.pause){
+        _webView.executeJavaScript('electronSafeIpc.send("buttonsFetched", ' + utils.getElement(_station.buttons.play) + ',' + utils.getElement(_station.buttons.pause) + ')');
+      }
+      else{
+        _webView.executeJavaScript(utils.click(_station))
+      }
     }
 
     _subscriber.publish('playpause', event);
   });
 
-/*
-  safeIPC.on("fromRenderer", function (a, b) {
-    console.log("fromRenderer received", a, b);
+  safeIPC.on("buttonsFetched", (playBtnEl:Element, pauseBtnEl:Element) => {
+    console.log('render on buttonsFetched', playBtnEl, pauseBtnEl)
+    _webView.executeJavaScript(utils.tryGetGuestStateAndClick(playBtnEl, pauseBtnEl))
   });
-*/
 
   return {
     setWebView: (wv:WebView) => {

@@ -1,6 +1,15 @@
+export enum ButtonPathType{
+  selector, iframe
+}
+
+export interface ButtonPath{
+  value:string;
+  type:string;
+}
+
 export interface StationButtons{
-  play:String;
-  pause:String;
+  play:ButtonPath;
+  pause:ButtonPath;
 }
 
 export interface Station{

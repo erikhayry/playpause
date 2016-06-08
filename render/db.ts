@@ -4,24 +4,47 @@ let db:Array<Station> = [
     name: 'BBC 6',
     url: 'https://www.bbc.co.uk/radio/player/bbc_6music',
     buttons: {
-      play: "document.querySelectorAll('#btn-stop')[0].click()",
-      pause: "document.querySelectorAll('#btn-stop')[0].click()"
+      play:
+        {
+          type: 'selddector',
+          value: '#btn-stop'
+        },
+      pause:
+        {
+          type: 'selector',
+          value: '#btn-stop'
+        }
+
     }
   },
   {
     name: 'Spotify',
     url: 'https://play.spotify.com/browse',
     buttons: {
-      play: "window.frames['app-player'].contentDocument.querySelectorAll('#play-pause')[0].click()",
-      pause: "window.frames['app-player'].contentDocument.querySelectorAll('#play-pause')[0].click()"
+      play: {
+          type: 'iframe',
+          value: 'app-player,#play-pause'
+        },
+      pause: {
+          type: 'iframe',
+          value: 'app-player,#play-pause'
+        }
     }
   },
   {
     name: 'Soundcloud',
     url: 'https://soundcloud.com/jonwayne',
     buttons: {
-      play: "document.querySelectorAll('button.playControl')[0].click()",
-      pause: "document.querySelectorAll('button.playControl')[0].click()"
+      play: {
+          type: 'selector',
+          value: 'button.playControl'
+        }
+      ,
+      pause: {
+          type: 'selector',
+          value: 'button.playControl'
+        }
+
     }
   }
 ];
