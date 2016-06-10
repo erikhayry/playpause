@@ -21,7 +21,6 @@ import {Render} from "../domain/render";
           <h3 class="text-center">{{webViewTitle}}</h3>
           <webview 
             #wv
-            src="https://soundcloud.com/jonwayne"
             id="wv"
             style="display:inline-flex; width:100%; height:100%"
             autosize="on"
@@ -48,6 +47,7 @@ export class WebviewComponent{
     console.log('app > WebviewComponent');
     this.render = (<PPWindowImpl>window).render;
     this.stations = this.render.getStations();
+    this.currentStation = this.stations[0];
     this.show = false
   }
 
@@ -55,7 +55,7 @@ export class WebviewComponent{
   ngAfterViewInit() {
     console.log('app > WebviewComponent.ngAfterViewInit', this.input);
     this.webView = this.input.nativeElement;
-
+    this.webView.src = this.currentStation.url;
     //Set up render
     this.render.on('playpause', (e:WebViewEvent) => {
       console.log('app > WebviewComponent render on playpause', e);
@@ -74,7 +74,7 @@ export class WebviewComponent{
       console.log('app > WebviewComponent webView on dom-ready', e);
       this.render.setWebView(this.webView);
       this.webViewTitle = this.webView.getTitle();
-      this.render.setStation(this.stations[2]);
+      this.render.setStation(this.currentStation);
       this.webView.openDevTools();
 
     });
@@ -98,7 +98,6 @@ export class WebviewComponent{
 
   setStation = (station:Station) => {
     this.webView.src = station.url;
-    this.render.setStation(station);
     this.currentStation = station;
   };
 

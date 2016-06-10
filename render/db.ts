@@ -6,8 +6,8 @@ let db:Array<Station> = [
     buttons: {
       play:
         {
-          type: 'selddector',
-          value: '#btn-stop'
+          type: 'selector',
+          value: '#btn-play'
         },
       pause:
         {

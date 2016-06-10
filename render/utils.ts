@@ -1,4 +1,5 @@
 import {ButtonPath, Station} from "../domain/station";
+import {ElementStyle} from "../domain/elementStyle";
 
 let Utils = (() => {
 
@@ -12,28 +13,26 @@ let Utils = (() => {
     }
   };
 
-  let _isPlaying = (playBtnEl:Element, pauseBtnEl:Element) => {
-    return true;
-  };
-
-
   return {
-    click(station:Station):string{
-      return _getElement(station.buttons.play) + '.click()'
+    click(buttonPath:ButtonPath):string{
+      console.log('Utils.click', buttonPath);
+      return _getElement(buttonPath) + '.click()'
     },
-    tryGetGuestStateAndClick(playBtnEl:Element, pauseBtnEl:Element){
-      //TODO classname not good enough
-      if(_isPlaying(playBtnEl, pauseBtnEl)){
-        return 'document.querySelectorAll("' + pauseBtnEl.className +'")[0].click()'
+    getGuestState(playBtnEl:ElementStyle, pauseBtnEl:ElementStyle):string{
+      console.log('Utils.getGuestState', playBtnEl.display, pauseBtnEl.display);
+
+      if(playBtnEl.display === 'none'){
+        return 'playing'
       }
       else{
-        return 'document.querySelectorAll("' + playBtnEl.className +'")[0].click()'
+        return'paused'
       }
     },
     getElement(path:ButtonPath){
       return _getElement(path)
     },
     getComputedStyle(path:ButtonPath){
+      console.log('Utils.getComputedStyle', path);
       return 'window.getComputedStyle(' + _getElement(path) + ')'
     }
   }
