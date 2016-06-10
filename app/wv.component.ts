@@ -18,10 +18,9 @@ import {Render} from "../domain/render";
           <button class="btn btn-block btn-primary" (click)="openDevTools()">Open dev tools</button>
         </div>        
         <div class="col-sm-9 main">
-          <h3 class="text-center">{{webViewTitle}}</h3>
+          <h3 class="text-center">{{guestTitle}}</h3>
           <webview 
-            #wv
-            id="wv"
+            #quest
             style="display:inline-flex; width:100%; height:100%"
             autosize="on"
             plugins
@@ -36,11 +35,11 @@ import {Render} from "../domain/render";
 })
 
 export class WebviewComponent{
-  private webView:WebView;
+  private guest:WebView;
   private render:Render;
   stations:Array<any>;
   currentStation:Station;
-  webViewTitle:string;
+  guestTitle:string;
 
   constructor() {
     console.log('app > WebviewComponent');
@@ -49,30 +48,30 @@ export class WebviewComponent{
     this.currentStation = this.stations[0];
   }
 
-  @ViewChild('wv') input:ElementRef;
+  @ViewChild('quest') input:ElementRef;
   ngAfterViewInit() {
     console.log('app > WebviewComponent.ngAfterViewInit', this.input);
-    this.webView = this.input.nativeElement;
-    this.webView.src = this.currentStation.url;
+    this.guest = this.input.nativeElement;
+    this.guest.src = this.currentStation.url;
 
     this.render.on('playpause', (e:WebViewEvent) => {
       console.log('app > WebviewComponent render on playpause', e);
     });
 
-    this.webView.addEventListener('dom-ready', (e:WebViewEvent) => {
+    this.guest.addEventListener('dom-ready', (e:WebViewEvent) => {
       console.log('app > WebviewComponent webView on dom-ready', e);
-      this.webViewTitle = this.webView.getTitle();
-      this.render.set(this.currentStation, this.webView);
-      this.webView.openDevTools();
+      this.guestTitle = this.guest.getTitle();
+      this.render.set(this.currentStation, this.guest);
+      this.guest.openDevTools();
     });
   }
 
   setStation = (station:Station) => {
-    this.webView.src = station.url;
+    this.guest.src = station.url;
     this.currentStation = station;
   };
 
   openDevTools = () => {
-    this.webView.openDevTools();
+    this.guest.openDevTools();
   }
 }
