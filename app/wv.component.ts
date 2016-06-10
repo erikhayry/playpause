@@ -41,14 +41,12 @@ export class WebviewComponent{
   stations:Array<any>;
   currentStation:Station;
   webViewTitle:string;
-  show = false
 
   constructor() {
     console.log('app > WebviewComponent');
     this.render = (<PPWindowImpl>window).render;
     this.stations = this.render.getStations();
     this.currentStation = this.stations[0];
-    this.show = false
   }
 
   @ViewChild('wv') input:ElementRef;
@@ -56,43 +54,16 @@ export class WebviewComponent{
     console.log('app > WebviewComponent.ngAfterViewInit', this.input);
     this.webView = this.input.nativeElement;
     this.webView.src = this.currentStation.url;
-    //Set up render
+
     this.render.on('playpause', (e:WebViewEvent) => {
       console.log('app > WebviewComponent render on playpause', e);
     });
 
-    //Web view events
-    this.webView.addEventListener('did-start-loading', (e:WebViewEvent) => {
-    //console.log('app > WebviewComponent webView on did-start-loading', e);
-    });
-
-    this.webView.addEventListener('did-stop-loading', (e:WebViewEvent) => {
-    //console.log('app > WebviewComponent webView on did-stop-loading', e);
-    });
-
     this.webView.addEventListener('dom-ready', (e:WebViewEvent) => {
       console.log('app > WebviewComponent webView on dom-ready', e);
-      this.render.setWebView(this.webView);
       this.webViewTitle = this.webView.getTitle();
-      this.render.setStation(this.currentStation);
+      this.render.set(this.currentStation, this.webView);
       this.webView.openDevTools();
-
-    });
-
-    this.webView.addEventListener('console-message', (e:WebViewEvent) => {
-      //console.log('app > WebviewComponent webView on console-message', e);
-    });
-
-    this.webView.addEventListener('media-started-playing', (e:WebViewEvent) => {
-      console.log('app > WebviewComponent webView on media-started-playing', e);
-    });
-
-    this.webView.addEventListener('media-paused', (e:WebViewEvent) => {
-      console.log('app > WebviewComponent webView on media-paused', e);
-    });
-
-    this.webView.addEventListener('media-paused', (e:WebViewEvent) => {
-      console.log('app > WebviewComponent webView on media-paused', e);
     });
   }
 

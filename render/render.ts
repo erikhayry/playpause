@@ -9,7 +9,7 @@ let render:Render = (function () {
   console.log('render');
 
   let electron:Electron = require('electron');
-  let safeIPC:SafeIPC = require("electron-safe-ipc/host-webview");
+  let guest:SafeIPC = require("electron-safe-ipc/host-webview");
   let fs = require('fs');
   let utils = require('./js/render/utils');
   let subscriber = require('./js/render/subscriber');
@@ -38,7 +38,7 @@ let render:Render = (function () {
     _subscriber.publish('playpause', event);
   });
 
-  safeIPC.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) => {
+  guest.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) => {
     console.log('render on buttonStylesFetched', !!playBtnStyle, !!pauseBtnStyles);
     switch(utils.getGuestState(playBtnStyle, pauseBtnStyles)){
       case 'playing':
@@ -51,17 +51,14 @@ let render:Render = (function () {
   });
 
   return {
-    setWebView: (wv:WebView) => {
-      console.log('render.setWebView', wv);
-      _webView = wv;
-    },
     getStations: () => {
       console.log('render.getStations');
       return db
     },
-    setStation: (station:Station) => {
+    set: (station:Station, wv:WebView) => {
       console.log('render.setStation', station);
       _station = station;
+      _webView = wv;
       _webView.executeJavaScript(fs.readFileSync('./node_modules/electron-safe-ipc/guest-bundle.js').toString());
     },
     on: _subscriber.on

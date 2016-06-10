@@ -1,4 +1,4 @@
-import {ButtonPath, Station} from "../domain/station";
+import {ButtonPath} from "../domain/station";
 import {ElementStyle} from "../domain/elementStyle";
 
 let Utils = (() => {
@@ -29,6 +29,7 @@ let Utils = (() => {
       }
     },
     getElement(path:ButtonPath){
+      console.log('Utils.getElement', path);
       return _getElement(path)
     },
     getComputedStyle(path:ButtonPath){
