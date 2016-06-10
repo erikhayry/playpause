@@ -32,6 +32,9 @@ let Utils = (() => {
     },
     getElement(path:ButtonPath){
       return _getElement(path)
+    },
+    getComputedStyle(path:ButtonPath){
+      return 'window.getComputedStyle(' + _getElement(path) + ')'
     }
   }
 })();

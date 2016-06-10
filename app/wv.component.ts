@@ -1,4 +1,4 @@
-import {ViewChild, Component, ElementRef} from '@angular/core';
+import {ViewChild, Component, ElementRef, SimpleChange} from '@angular/core';
 import {PPWindowImpl} from "../domain/window";
 import {WebView, WebViewEvent} from "../domain/webView";
 import {Station} from "../domain/station";
@@ -17,10 +17,11 @@ import {Render} from "../domain/render";
           </ul>
           <button class="btn btn-block btn-primary" (click)="openDevTools()">Open dev tools</button>
         </div>        
-        <div class="col-sm-9 main" *ngIf="wvSrc != ''">
+        <div class="col-sm-9 main">
           <h3 class="text-center">{{webViewTitle}}</h3>
           <webview 
             #wv
+            src="https://soundcloud.com/jonwayne"
             id="wv"
             style="display:inline-flex; width:100%; height:100%"
             autosize="on"
@@ -28,8 +29,9 @@ import {Render} from "../domain/render";
             allowpopups
             disablewebsecurity
           ></webview>    
-          </div>
+          </div>         
         </div>
+        
      </div>   
   `
 })
@@ -40,56 +42,63 @@ export class WebviewComponent{
   stations:Array<any>;
   currentStation:Station;
   webViewTitle:string;
+  show = false
 
   constructor() {
     console.log('app > WebviewComponent');
     this.render = (<PPWindowImpl>window).render;
     this.stations = this.render.getStations();
+    this.show = false
   }
 
   @ViewChild('wv') input:ElementRef;
   ngAfterViewInit() {
-    console.log('app > WebviewComponent.ngAfterViewInit', this.input.nativeElement);
+    console.log('app > WebviewComponent.ngAfterViewInit', this.input);
     this.webView = this.input.nativeElement;
 
     //Set up render
-    this.render.setWebView(this.webView);
     this.render.on('playpause', (e:WebViewEvent) => {
       console.log('app > WebviewComponent render on playpause', e);
     });
 
     //Web view events
     this.webView.addEventListener('did-start-loading', (e:WebViewEvent) => {
-      //console.log('app > WebviewComponent webView on did-start-loading', e);
+    //console.log('app > WebviewComponent webView on did-start-loading', e);
     });
 
     this.webView.addEventListener('did-stop-loading', (e:WebViewEvent) => {
-      //console.log('app > WebviewComponent webView on did-stop-loading', e);
+    //console.log('app > WebviewComponent webView on did-stop-loading', e);
     });
 
-    this.webView.addEventListener('dom-ready', (e:WebViewEvent)=> {
+    this.webView.addEventListener('dom-ready', (e:WebViewEvent) => {
       console.log('app > WebviewComponent webView on dom-ready', e);
-      this.webViewTitle = this.webView.getTitle()
+      this.render.setWebView(this.webView);
+      this.webViewTitle = this.webView.getTitle();
+      this.render.setStation(this.stations[2]);
+      this.webView.openDevTools();
+
     });
 
-    this.webView.addEventListener('console-message', (e:WebViewEvent)=> {
+    this.webView.addEventListener('console-message', (e:WebViewEvent) => {
       //console.log('app > WebviewComponent webView on console-message', e);
     });
 
-    this.webView.addEventListener('media-started-playing', (e:WebViewEvent)=> {
+    this.webView.addEventListener('media-started-playing', (e:WebViewEvent) => {
       console.log('app > WebviewComponent webView on media-started-playing', e);
-
     });
 
-    this.webView.addEventListener('media-paused', (e:WebViewEvent)=> {
+    this.webView.addEventListener('media-paused', (e:WebViewEvent) => {
       console.log('app > WebviewComponent webView on media-paused', e);
+    });
 
+    this.webView.addEventListener('media-paused', (e:WebViewEvent) => {
+      console.log('app > WebviewComponent webView on media-paused', e);
     });
   }
 
-  setStation = (station:Station) =>{
+  setStation = (station:Station) => {
     this.webView.src = station.url;
-    this.render.setStation(station)
+    this.render.setStation(station);
     this.currentStation = station;
   };
 

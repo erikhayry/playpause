@@ -3,6 +3,7 @@ import {Render} from "../domain/render";
 import {WebView} from "../domain/webView";
 import {Electron, SafeIPC, IpcRendererEvent} from "../domain/electron";
 import {Station} from "../domain/station";
+import {ElementStyle} from "../domain/elementStyle";
 
 let render:Render = (function () {
   console.log('render');
@@ -17,30 +18,35 @@ let render:Render = (function () {
   let _webView:WebView;
   let _subscriber = new subscriber();
   let _station:Station;
-  
+
   //Events
-  electron.ipcRenderer.on('playpause', (event:IpcRendererEvent) => {
+  require('electron').ipcRenderer.on('playpause', (event:IpcRendererEvent) => {
     console.log('render on playpause', event);
 
     //TODO check if injected
     _webView.executeJavaScript(fs.readFileSync('./node_modules/electron-safe-ipc/guest-bundle.js').toString());
     _webView.executeJavaScript('console.log("guest > on playpause")');
+    let _fetchButtons = 'electronSafeIpc.send("buttonsFetched", ' + utils.getComputedStyle(_station.buttons.play) + ',' + utils.getComputedStyle(_station.buttons.pause) + ')';
+    console.log(_fetchButtons);
+    _webView.executeJavaScript(_fetchButtons);
 
-    if(_station){
-      if(_station.buttons.play !== _station.buttons.pause){
-        _webView.executeJavaScript('electronSafeIpc.send("buttonsFetched", ' + utils.getElement(_station.buttons.play) + ',' + utils.getElement(_station.buttons.pause) + ')');
+/*    if(_station){
+      if(_station.buttons.play === _station.buttons.pause){
+        let _fetchButtons = 'electronSafeIpc.send("buttonsFetched", ' + utils.getComputedStyle(_station.buttons.play) + ',' + utils.getComputedStyle(_station.buttons.pause) + ')';
+        console.log(_fetchButtons);
+        _webView.executeJavaScript(_fetchButtons);
       }
       else{
         _webView.executeJavaScript(utils.click(_station))
       }
     }
 
-    _subscriber.publish('playpause', event);
+    _subscriber.publish('playpause', event);*/
   });
 
-  safeIPC.on("buttonsFetched", (playBtnEl:Element, pauseBtnEl:Element) => {
-    console.log('render on buttonsFetched', playBtnEl, pauseBtnEl)
-    _webView.executeJavaScript(utils.tryGetGuestStateAndClick(playBtnEl, pauseBtnEl))
+  require("electron-safe-ipc/host-webview").on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) => {
+    console.log('render on buttonStylesFetched', playBtnStyle.display, pauseBtnStyles.display);
+    //_webView.executeJavaScript(utils.tryGetGuestStateAndClick(playBtnEl, pauseBtnEl))
   });
 
   return {
@@ -54,8 +60,13 @@ let render:Render = (function () {
     },
     setStation: (station:Station) => {
       console.log('render.setStation', station);
-
       _station = station;
+      _webView.executeJavaScript(fs.readFileSync('./node_modules/electron-safe-ipc/guest-bundle.js').toString());
+      _webView.executeJavaScript('console.log("guest > on playpause")');
+
+      let _fetchButtons = 'electronSafeIpc.send("buttonStylesFetched", ' + utils.getComputedStyle(_station.buttons.play) + ',' + utils.getComputedStyle(_station.buttons.pause) + ')';
+      console.log(_fetchButtons);
+      _webView.executeJavaScript(_fetchButtons);
     },
     on: _subscriber.on
   }

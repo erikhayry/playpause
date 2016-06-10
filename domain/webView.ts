@@ -11,5 +11,6 @@ export interface WebView{
   addEventListener(event:String, callback:WebViewEventCallback):any
   openDevTools():void
   getTitle():string
+  reload():void
   src:String
 }
