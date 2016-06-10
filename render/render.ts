@@ -8,47 +8,47 @@ import {ElementStyle} from "../domain/elementStyle";
 let render:Render = (function () {
   console.log('render');
 
-  const main:IpcRenderer = require('electron').ipcRenderer;
-  const guest:SafeIPC = require("electron-safe-ipc/host-webview");
+  const MAIN:IpcRenderer = require('electron').ipcRenderer;
+  const GUEST:SafeIPC = require("electron-safe-ipc/host-webview");
 
   const fs = require('fs');
-  
+
   const utils = require('./js/render/utils');
   const subscriber = require('./js/render/subscriber');
   const db = require('./js/render/db');
 
-  let _webView:WebView;
+  let _guest:WebView;
   let _subscriber = new subscriber();
   let _station:Station;
 
   //Events
-  main.on('playpause', (event:IpcRendererEvent) => {
+  MAIN.on('playpause', (event:IpcRendererEvent) => {
     console.log('render on playpause', event);
-    _webView.executeJavaScript('console.log("guest > on playpause")');
+    _guest.executeJavaScript('console.log("guest > on playpause")');
 
     if(_station){
       if(_station.buttons.play !== _station.buttons.pause){
         let _fetchButtons = 'electronSafeIpc.send("buttonStylesFetched", ' + utils.getComputedStyle(_station.buttons.play) + ',' + utils.getComputedStyle(_station.buttons.pause) + ')';
         console.log(_fetchButtons);
-        _webView.executeJavaScript(_fetchButtons);
+        _guest.executeJavaScript(_fetchButtons);
       }
       else{
-        _webView.executeJavaScript(utils.click(_station.buttons.play))
+        _guest.executeJavaScript(utils.click(_station.buttons.play))
       }
     }
 
     _subscriber.publish('playpause', event);
   });
 
-  guest.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) => {
+  GUEST.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) => {
     console.log('render on buttonStylesFetched', !!playBtnStyle, !!pauseBtnStyles);
     switch(utils.getGuestState(playBtnStyle, pauseBtnStyles)){
       case 'playing':
-        _webView.executeJavaScript(utils.click(_station.buttons.pause))
+        _guest.executeJavaScript(utils.click(_station.buttons.pause))
         break;
       case 'paused':
       default:
-        _webView.executeJavaScript(utils.click(_station.buttons.play))
+        _guest.executeJavaScript(utils.click(_station.buttons.play))
     }
   });
 
@@ -57,11 +57,11 @@ let render:Render = (function () {
       console.log('render.getStations');
       return db
     },
-    set: (station:Station, wv:WebView) => {
+    set: (station:Station, guest:WebView) => {
       console.log('render.setStation', station);
       _station = station;
-      _webView = wv;
-      _webView.executeJavaScript(fs.readFileSync('./node_modules/electron-safe-ipc/guest-bundle.js').toString());
+      _guest = guest;
+      _guest.executeJavaScript(fs.readFileSync('./node_modules/electron-safe-ipc/guest-bundle.js').toString());
     },
     on: _subscriber.on
   }
