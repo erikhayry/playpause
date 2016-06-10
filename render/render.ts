@@ -1,26 +1,28 @@
 "use strict";
 import {Render} from "../domain/render";
 import {WebView} from "../domain/webView";
-import {Electron, SafeIPC, IpcRendererEvent} from "../domain/electron";
+import {Electron, SafeIPC, IpcRendererEvent, IpcRenderer} from "../domain/electron";
 import {Station} from "../domain/station";
 import {ElementStyle} from "../domain/elementStyle";
 
 let render:Render = (function () {
   console.log('render');
 
-  let electron:Electron = require('electron');
-  let guest:SafeIPC = require("electron-safe-ipc/host-webview");
-  let fs = require('fs');
-  let utils = require('./js/render/utils');
-  let subscriber = require('./js/render/subscriber');
-  let db = require('./js/render/db');
+  const main:IpcRenderer = require('electron').ipcRenderer;
+  const guest:SafeIPC = require("electron-safe-ipc/host-webview");
+
+  const fs = require('fs');
+  
+  const utils = require('./js/render/utils');
+  const subscriber = require('./js/render/subscriber');
+  const db = require('./js/render/db');
 
   let _webView:WebView;
   let _subscriber = new subscriber();
   let _station:Station;
 
   //Events
-  electron.ipcRenderer.on('playpause', (event:IpcRendererEvent) => {
+  main.on('playpause', (event:IpcRendererEvent) => {
     console.log('render on playpause', event);
     _webView.executeJavaScript('console.log("guest > on playpause")');
 
