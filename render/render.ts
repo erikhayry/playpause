@@ -22,13 +22,7 @@ let render:Render = (function () {
   //Events
   electron.ipcRenderer.on('playpause', (event:IpcRendererEvent) => {
     console.log('render on playpause', event);
-
-    //TODO check if injected
-    _webView.executeJavaScript(fs.readFileSync('./node_modules/electron-safe-ipc/guest-bundle.js').toString());
     _webView.executeJavaScript('console.log("guest > on playpause")');
-    let _fetchButtons = 'electronSafeIpc.send("buttonsFetched", ' + utils.getComputedStyle(_station.buttons.play) + ',' + utils.getComputedStyle(_station.buttons.pause) + ')';
-    console.log(_fetchButtons);
-    _webView.executeJavaScript(_fetchButtons);
 
     if(_station){
       if(_station.buttons.play !== _station.buttons.pause){
