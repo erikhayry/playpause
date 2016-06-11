@@ -16,6 +16,7 @@ import {Render} from "../domain/render";
                 <button class="btn btn-block btn-primary" (click)="setStation(station)">{{station.name}}</button>
               </li>
           </ul>
+          <button class="btn btn-block btn-primary" (click)="addStation()">Add Station</button>
           <button class="btn btn-block btn-primary" (click)="openDevTools()">Open dev tools</button>
         </div>        
         <div class="col-sm-9 main">
@@ -46,15 +47,23 @@ export class WebviewComponent{
   constructor() {
     console.log('%c app > WebviewComponent', this.LOG);
     this.render = (<PPWindowImpl>window).render;
-    this.stations = this.render.getStations();
-    this.currentStation = this.stations[0];
+    this.render.getStations().then(stations => {
+      console.log(stations)
+      this.stations = stations;
+      this.currentStation = this.stations[0];
+      if(this.currentStation && this.guest && !this.guest.src){
+        this.guest.src = this.currentStation.url;
+      }
+    });
   }
 
   @ViewChild('quest') input:ElementRef;
   ngAfterViewInit() {
     console.log('%c app > WebviewComponent.ngAfterViewInit', this.LOG, this.input);
     this.guest = this.input.nativeElement;
-    this.guest.src = this.currentStation.url;
+    if(this.currentStation &&  !this.guest.src){
+      this.guest.src = this.currentStation.url;
+    }
 
     this.render.on('playpause', (e:WebViewEvent) => {
       console.log('%c app > WebviewComponent render on playpause', this.LOG, e);
@@ -75,5 +84,9 @@ export class WebviewComponent{
 
   openDevTools = () => {
     this.guest.openDevTools();
-  }
+  };
+
+  addStation = () => {
+    console.log('%c app > WebviewComponent.addStation()', this.LOG);
+  };
 }
