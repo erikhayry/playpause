@@ -18,3 +18,4 @@ js/**
 !wallaby.js
 !/main.js
 !main/**
+!lib/**
