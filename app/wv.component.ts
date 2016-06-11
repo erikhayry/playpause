@@ -4,6 +4,7 @@ import {WebView, WebViewEvent} from "../domain/webView";
 import {Station} from "../domain/station";
 import {Render} from "../domain/render";
 
+
 @Component({
   selector: 'wv',
   template: `
@@ -35,6 +36,7 @@ import {Render} from "../domain/render";
 })
 
 export class WebviewComponent{
+  private LOG = 'color: red; font-weight: bold;';
   private guest:WebView;
   private render:Render;
   stations:Array<any>;
@@ -42,7 +44,7 @@ export class WebviewComponent{
   guestTitle:string;
 
   constructor() {
-    console.log('app > WebviewComponent');
+    console.log('%c app > WebviewComponent', this.LOG);
     this.render = (<PPWindowImpl>window).render;
     this.stations = this.render.getStations();
     this.currentStation = this.stations[0];
@@ -50,16 +52,16 @@ export class WebviewComponent{
 
   @ViewChild('quest') input:ElementRef;
   ngAfterViewInit() {
-    console.log('app > WebviewComponent.ngAfterViewInit', this.input);
+    console.log('%c app > WebviewComponent.ngAfterViewInit', this.LOG, this.input);
     this.guest = this.input.nativeElement;
     this.guest.src = this.currentStation.url;
 
     this.render.on('playpause', (e:WebViewEvent) => {
-      console.log('app > WebviewComponent render on playpause', e);
+      console.log('%c app > WebviewComponent render on playpause', this.LOG, e);
     });
 
     this.guest.addEventListener('dom-ready', (e:WebViewEvent) => {
-      console.log('app > WebviewComponent webView on dom-ready', e);
+      console.log('%c app > WebviewComponent webView on dom-ready', this.LOG, e);
       this.guestTitle = this.guest.getTitle();
       this.render.set(this.currentStation, this.guest);
       this.guest.openDevTools();

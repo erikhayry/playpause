@@ -1,13 +1,15 @@
 import {Subscriber as Sub} from "../domain/subscriber";
 
 let Subscriber = ():Sub => {
-  console.log('render > subscriber');
+  const LOG = 'color: brown; font-weight: bold;';
+
+  console.log('%c render > subscriber', LOG);
   let _topics = {};
   let _hasOwnProperty = _topics.hasOwnProperty;
 
   return {
     on: (topic:string, listener:any) => {
-      console.log('render > subscriber.on', topic, listener);
+      console.log('%c render > subscriber.on', LOG, topic, typeof listener);
 
       if(!_hasOwnProperty.call(_topics, topic)) _topics[topic] = [];
       let index = _topics[topic].push(listener) -1;
@@ -20,7 +22,7 @@ let Subscriber = ():Sub => {
     },
 
     publish: (topic:string, info:any) => {
-      console.log('render > subscriber.on', topic, info);
+      console.log('%c render > subscriber.on', LOG, topic, info);
 
       if(!_hasOwnProperty.call(_topics, topic)) return;
 

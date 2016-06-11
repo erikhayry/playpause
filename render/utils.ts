@@ -2,6 +2,7 @@ import {ButtonPath} from "../domain/station";
 import {ElementStyle} from "../domain/elementStyle";
 
 let Utils = (() => {
+  const LOG = 'color: purple; font-weight: bold;';
 
   let _getElement = (path:ButtonPath) => {
     if(path.type === 'selector'){
@@ -15,11 +16,12 @@ let Utils = (() => {
 
   return {
     click(buttonPath:ButtonPath):string{
-      console.log('Utils.click', buttonPath);
+      console.log('%c Utils.click', LOG, buttonPath);
       return _getElement(buttonPath) + '.click()'
     },
+
     getGuestState(playBtnEl:ElementStyle, pauseBtnEl:ElementStyle):string{
-      console.log('Utils.getGuestState', playBtnEl.display, pauseBtnEl.display);
+      console.log('%c Utils.getGuestState', LOG, playBtnEl.display, pauseBtnEl.display);
 
       if(playBtnEl.display === 'none'){
         return 'playing'
@@ -28,12 +30,14 @@ let Utils = (() => {
         return'paused'
       }
     },
+
     getElement(path:ButtonPath){
-      console.log('Utils.getElement', path);
+      console.log('%c Utils.getElement', LOG, path);
       return _getElement(path)
     },
+
     getComputedStyle(path:ButtonPath){
-      console.log('Utils.getComputedStyle', path);
+      console.log('%c Utils.getComputedStyle', LOG, path);
       return 'window.getComputedStyle(' + _getElement(path) + ')'
     }
   }

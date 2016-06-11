@@ -6,7 +6,8 @@ import {Station} from "../domain/station";
 import {ElementStyle} from "../domain/elementStyle";
 
 let render:Render = (function () {
-  console.log('render');
+  const LOG = 'color: green; font-weight: bold;';
+  console.log('%c render', LOG);
 
   const MAIN:IpcRenderer = require('electron').ipcRenderer;
   const GUEST:SafeIPC = require("electron-safe-ipc/host-webview");
@@ -23,13 +24,13 @@ let render:Render = (function () {
 
   //Events
   MAIN.on('playpause', (event:IpcRendererEvent) => {
-    console.log('render on playpause', event);
-    _guest.executeJavaScript('console.log("guest > on playpause")');
+    console.log('%c render on playpause', LOG, event);
+    _guest.executeJavaScript('console.log("%c guest > on playpause", "color:red; font-weight: bold;")');
 
     if(_station){
       if(_station.buttons.play !== _station.buttons.pause){
         let _fetchButtons = 'electronSafeIpc.send("buttonStylesFetched", ' + utils.getComputedStyle(_station.buttons.play) + ',' + utils.getComputedStyle(_station.buttons.pause) + ')';
-        console.log(_fetchButtons);
+        console.log('%c ' + _fetchButtons, LOG);
         _guest.executeJavaScript(_fetchButtons);
       }
       else{
@@ -41,10 +42,10 @@ let render:Render = (function () {
   });
 
   GUEST.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) => {
-    console.log('render on buttonStylesFetched', !!playBtnStyle, !!pauseBtnStyles);
+    console.log('%c render on buttonStylesFetched', LOG, !!playBtnStyle, !!pauseBtnStyles);
     switch(utils.getGuestState(playBtnStyle, pauseBtnStyles)){
       case 'playing':
-        _guest.executeJavaScript(utils.click(_station.buttons.pause))
+        _guest.executeJavaScript(utils.click(_station.buttons.pause));
         break;
       case 'paused':
       default:
@@ -54,14 +55,14 @@ let render:Render = (function () {
 
   return {
     getStations: () => {
-      console.log('render.getStations');
+      console.log('%c render.getStations', LOG);
       return db
     },
     set: (station:Station, guest:WebView) => {
-      console.log('render.setStation', station);
+      console.log('%c render.setStation', LOG,  station);
       _station = station;
       _guest = guest;
-      _guest.executeJavaScript(fs.readFileSync('./node_modules/electron-safe-ipc/guest-bundle.js').toString());
+      _guest.executeJavaScript(fs.readFileSync('./lib/electronSafeIpc.js').toString());
     },
     on: _subscriber.on
   }
