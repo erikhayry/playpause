@@ -21,7 +21,7 @@ let render:Render = (function () {
   let _guest:WebView;
   let _subscriber = new subscriber();
   let _station:Station;
-  
+
   //Events
   MAIN.on('playpause', (event:IpcRendererEvent) => {
     console.log('%c render on playpause', LOG, event);
@@ -54,10 +54,10 @@ let render:Render = (function () {
   });
 
   return {
-    getStations: ():Promise<Array<Station>> => {
-      console.log('%c render.getStations', LOG);
-      return db.get()
-    },
+    getStations: db.getAll,
+    getStation: db.get,
+    addStation: db.add,
+    removeStation: db.remove,
     set: (station:Station, guest:WebView) => {
       console.log('%c render.setStation', LOG,  station);
       _station = station;

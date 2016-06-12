@@ -12,8 +12,8 @@ export interface StationButtons{
   pause:ButtonPath;
 }
 
-export interface Station{
+export interface Station {
   name:String
   url:String
-  buttons: StationButtons
+  buttons:StationButtons;
 }

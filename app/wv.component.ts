@@ -1,8 +1,8 @@
 import {ViewChild, Component, ElementRef, SimpleChange} from '@angular/core';
 import {PPWindowImpl} from "../domain/window";
 import {WebView, WebViewEvent} from "../domain/webView";
-import {Station} from "../domain/station";
 import {Render} from "../domain/render";
+import {Station, ButtonPath, StationButtons} from "./stations";
 
 
 @Component({
@@ -13,12 +13,35 @@ import {Render} from "../domain/render";
         <div class="col-sm-3 sidebar">
           <ul class="nav nav-sidebar" >
               <li *ngFor="let station of stations">
-                <button class="btn btn-block btn-primary" (click)="setStation(station)">{{station.name}}</button>
+                {{station.name}} 
+                <button class="btn btn-block btn-primary" (click)="openStation(station)">Open</button>
+                <button class="btn btn-block btn-danger" (click)="removeStation(station.url)">Remove</button>
               </li>
           </ul>
-          <button class="btn btn-block btn-primary" (click)="addStation()">Add Station</button>
+          <hr>
+          <button class="btn btn-block btn-primary" (click)="adding = true">Add Station</button>
           <button class="btn btn-block btn-primary" (click)="openDevTools()">Open dev tools</button>
-        </div>        
+          
+          <div *ngIf="adding">
+            <hr>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="URL" [(ngModel)]="newUrl">
+            </div>       
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Name" [(ngModel)]="newName">
+            </div>   
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="play button" [(ngModel)]="newPlay">
+            </div>   
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="pause button" [(ngModel)]="newPause">
+            </div> 
+            <br>
+            <button class="btn btn-block btn-primary" (click)="addStation(newUrl, newName, newPlay, newPause)" [disabled]="!newUrl">Add</button>
+            <button class="btn btn-block btn-primary" (click)="adding = false">Close</button>
+          </div> 
+        </div>              
+               
         <div class="col-sm-9 main">
           <h3 class="text-center">{{guestTitle}}</h3>
           <webview 
@@ -43,6 +66,11 @@ export class WebviewComponent{
   stations:Array<any>;
   currentStation:Station;
   guestTitle:string;
+  adding = false;
+  newUrl:string;
+  newName:string;
+  newPlay:string;
+  newPause:string;
 
   constructor() {
     console.log('%c app > WebviewComponent', this.LOG);
@@ -77,16 +105,30 @@ export class WebviewComponent{
     });
   }
 
-  setStation = (station:Station) => {
+  openStation = (station:Station) => {
     this.guest.src = station.url;
     this.currentStation = station;
+  };
+
+  removeStation = (url:string) => {
+    this.render.removeStation(url).then(stations => {
+      console.log(stations)
+      this.stations = stations;
+    })
   };
 
   openDevTools = () => {
     this.guest.openDevTools();
   };
 
-  addStation = () => {
-    console.log('%c app > WebviewComponent.addStation()', this.LOG);
+  addStation = (newUrl, newName, newPlay, newPause) => {
+    let _play = new ButtonPath(newPlay, 'selector');
+    let _pause = new ButtonPath(newPause, 'selector');
+    let _buttons = new StationButtons(_play, _pause);
+
+    this.render.addStation(new Station(newName, newUrl, _buttons)).then(stations => {
+      console.log(stations);
+      this.stations = stations;
+    })
   };
 }

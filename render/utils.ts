@@ -1,5 +1,5 @@
-import {ButtonPath} from "../domain/station";
 import {ElementStyle} from "../domain/elementStyle";
+import {ButtonPath} from "../domain/station";
 
 let Utils = (() => {
   const LOG = 'color: purple; font-weight: bold;';
