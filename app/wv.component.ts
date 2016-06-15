@@ -3,6 +3,7 @@ import {PPWindowImpl} from "../domain/window";
 import {WebView, WebViewEvent} from "../domain/webView";
 import {Render} from "../domain/render";
 import {Station, ButtonPath, StationButtons} from "./stations";
+import {Observable} from "rxjs/Rx";
 
 
 @Component({
@@ -63,7 +64,7 @@ export class WebviewComponent{
   private LOG = 'color: red; font-weight: bold;';
   private guest:WebView;
   private render:Render;
-  stations:Array<any>;
+  stations:Observable<Array<any>>;
   currentStation:Station;
   guestTitle:string;
   adding = false;
@@ -106,13 +107,15 @@ export class WebviewComponent{
   }
 
   openStation = (station:Station) => {
+    console.log('%c app > WebviewComponent.openStation', this.LOG, station);
     this.guest.src = station.url;
     this.currentStation = station;
   };
 
   removeStation = (url:string) => {
+    console.log('%c app > WebviewComponent.removeStation', this.LOG, url);
     this.render.removeStation(url).then(stations => {
-      console.log(stations)
+      console.log('%c app > WebviewComponent.removeStation > removed', this.LOG, stations);
       this.stations = stations;
     })
   };
@@ -122,12 +125,14 @@ export class WebviewComponent{
   };
 
   addStation = (newUrl, newName, newPlay, newPause) => {
+    console.log('%c app > WebviewComponent.addStation', this.LOG, newUrl, newName, newPlay, newPause);
+
     let _play = new ButtonPath(newPlay, 'selector');
     let _pause = new ButtonPath(newPause, 'selector');
     let _buttons = new StationButtons(_play, _pause);
 
     this.render.addStation(new Station(newName, newUrl, _buttons)).then(stations => {
-      console.log(stations);
+      console.log('%c app > WebviewComponent.removeStation > added', this.LOG, stations);
       this.stations = stations;
     })
   };
