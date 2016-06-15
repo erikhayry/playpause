@@ -11,6 +11,10 @@ let render:Render = (function () {
 
   const MAIN:IpcRenderer = require('electron').ipcRenderer;
   const GUEST:SafeIPC = require("electron-safe-ipc/host-webview");
+  const remote = require('electron').remote
+  const path = require('path');
+
+  console.log(path.dirname(require.main.filename))
 
   const fs = require('fs');
 
@@ -62,7 +66,8 @@ let render:Render = (function () {
       console.log('%c render.setStation', LOG,  station);
       _station = station;
       _guest = guest;
-      _guest.executeJavaScript(fs.readFileSync('./lib/electronSafeIpc.js').toString());
+
+      _guest.executeJavaScript(fs.readFileSync(path.dirname(require.main.filename) + '/lib/electronSafeIpc.js').toString());
     },
     on: _subscriber.on
   }

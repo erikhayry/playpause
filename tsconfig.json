@@ -10,5 +10,9 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "outDir": "js"
-  }
+  },
+  "exclude": [
+    "out",
+    "node_modules"
+  ]
 }

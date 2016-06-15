@@ -10,6 +10,7 @@ _test-output
 _temp
 js/**
 pp_db
+out
 
 !**/*e2e-spec.js
 !karma*.js
