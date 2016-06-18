@@ -64,7 +64,7 @@ export class WebviewComponent{
   private LOG = 'color: red; font-weight: bold;';
   private guest:WebView;
   private render:Render;
-  stations:Observable<Array<any>>;
+  stations:Array<Station>;
   currentStation:Station;
   guestTitle:string;
   adding = false;
@@ -76,25 +76,21 @@ export class WebviewComponent{
   constructor() {
     console.log('%c app > WebviewComponent', this.LOG);
     this.render = (<PPWindowImpl>window).render;
-    this.render.getStations().then(stations => {
-      console.log(stations)
-      this.stations = stations;
-      this.currentStation = this.stations[0];
-      if(this.currentStation && this.guest && !this.guest.src){
-        this.guest.src = this.currentStation.url;
-      }
-    });
   }
 
   @ViewChild('quest') input:ElementRef;
   ngAfterViewInit() {
     console.log('%c app > WebviewComponent.ngAfterViewInit', this.LOG, this.input);
     this.guest = this.input.nativeElement;
-    if(this.currentStation &&  !this.guest.src){
+
+    this.render.getStations().then(stations => {
+      this.stations = stations;
+      this.currentStation = this.stations[0];
       this.guest.src = this.currentStation.url;
-    }
+    });
 
     this.render.on('playpause', (e:WebViewEvent) => {
+
       console.log('%c app > WebviewComponent render on playpause', this.LOG, e);
     });
 
@@ -124,7 +120,7 @@ export class WebviewComponent{
     this.guest.openDevTools();
   };
 
-  addStation = (newUrl, newName, newPlay, newPause) => {
+  addStation = (newUrl:string, newName:string, newPlay:string, newPause:string) => {
     console.log('%c app > WebviewComponent.addStation', this.LOG, newUrl, newName, newPlay, newPause);
 
     let _play = new ButtonPath(newPlay, 'selector');

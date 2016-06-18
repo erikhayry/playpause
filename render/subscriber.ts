@@ -15,7 +15,9 @@ let Subscriber = ():Sub => {
       let index = _topics[topic].push(listener) -1;
 
       return {
-        remove: function() {
+        remove: function(topic:string) {
+          console.log('%c render > subscriber.on.delete', LOG, topic);
+          console.log(_topics)
           delete _topics[topic][index];
         }
       };

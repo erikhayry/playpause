@@ -10,6 +10,7 @@
     "tsc": "tsc",
     "tsc:w": "tsc -w",
     "typings": "typings",
+    "test": "mocha test/**",
     "webdriver:update": "webdriver-manager update"
   },
   "keywords": [],
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "canonical-path": "0.0.2",
+    "chai": "^3.5.0",
     "concurrently": "^2.0.0",
     "electron-installer-dmg": "^0.1.1",
     "electron-prebuilt": "^0.36.0",

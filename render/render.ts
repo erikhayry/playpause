@@ -11,7 +11,6 @@ let render:Render = (function () {
 
   const MAIN:IpcRenderer = require('electron').ipcRenderer;
   const GUEST:SafeIPC = require("electron-safe-ipc/host-webview");
-  const remote = require('electron').remote
   const path = require('path');
 
   console.log(path.dirname(require.main.filename))

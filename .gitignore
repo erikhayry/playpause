@@ -21,3 +21,4 @@ out
 !/main.js
 !main/**
 !lib/**
+!test/**/*
