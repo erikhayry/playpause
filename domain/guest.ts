@@ -6,7 +6,4 @@ export interface Guest{
   getStatus():string;
 
   onPlayPause():void
-  onButtonStylesFetched(playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle):void
-  onButtonsFetched(buttons:Array<any>):void
-
 }
