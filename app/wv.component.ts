@@ -1,10 +1,8 @@
-import {ViewChild, Component, ElementRef, SimpleChange} from '@angular/core';
+import {ViewChild, Component, ElementRef} from '@angular/core';
 import {PPWindowImpl} from "../domain/window";
 import {WebView, WebViewEvent} from "../domain/webView";
 import {Render} from "../domain/render";
 import {Station, ButtonPath, StationButtons} from "./stations";
-import {Observable} from "rxjs/Rx";
-
 
 @Component({
   selector: 'wv',

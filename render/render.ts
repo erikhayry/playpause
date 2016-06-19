@@ -1,59 +1,33 @@
 "use strict";
 import {Render} from "../domain/render";
 import {WebView} from "../domain/webView";
-import {Electron, SafeIPC, IpcRendererEvent, IpcRenderer} from "../domain/electron";
+import {SafeIPC, IpcRendererEvent, IpcRenderer} from "../domain/electron";
 import {Station} from "../domain/station";
-import {ElementStyle} from "../domain/elementStyle";
+import {Guest} from "../domain/guest";
 
 let render:Render = (function () {
   const LOG = 'color: green; font-weight: bold;';
   console.log('%c render', LOG);
 
   const MAIN:IpcRenderer = require('electron').ipcRenderer;
-  const GUEST:SafeIPC = require("electron-safe-ipc/host-webview");
+  const SafeIPC:SafeIPC = require("electron-safe-ipc/host-webview");
   const path = require('path');
-
-  console.log(path.dirname(require.main.filename))
 
   const fs = require('fs');
 
-  const utils = require('./js/render/utils');
   const subscriber = require('./js/render/subscriber');
+  const Guest = require('./js/render/guest');
   const db = require('./js/render/db');
+  const utils = require('./js/render/utils.js');
 
-  let _guest:WebView;
+  let _guest:Guest;
   let _subscriber = new subscriber();
-  let _station:Station;
 
   //Events
   MAIN.on('playpause', (event:IpcRendererEvent) => {
     console.log('%c render on playpause', LOG, event);
-    _guest.executeJavaScript('console.log("%c guest > on playpause", "color:red; font-weight: bold;")');
-
-    if(_station){
-      if(_station.buttons.play !== _station.buttons.pause){
-        let _fetchButtons = 'electronSafeIpc.send("buttonStylesFetched", ' + utils.getComputedStyle(_station.buttons.play) + ',' + utils.getComputedStyle(_station.buttons.pause) + ')';
-        console.log('%c ' + _fetchButtons, LOG);
-        _guest.executeJavaScript(_fetchButtons);
-      }
-      else{
-        _guest.executeJavaScript(utils.click(_station.buttons.play))
-      }
-    }
-
+    _guest.onPlayPause();
     _subscriber.publish('playpause', event);
-  });
-
-  GUEST.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) => {
-    console.log('%c render on buttonStylesFetched', LOG, !!playBtnStyle, !!pauseBtnStyles);
-    switch(utils.getGuestState(playBtnStyle, pauseBtnStyles)){
-      case 'playing':
-        _guest.executeJavaScript(utils.click(_station.buttons.pause));
-        break;
-      case 'paused':
-      default:
-        _guest.executeJavaScript(utils.click(_station.buttons.play))
-    }
   });
 
   return {
@@ -61,12 +35,13 @@ let render:Render = (function () {
     getStation: db.get,
     addStation: db.add,
     removeStation: db.remove,
-    set: (station:Station, guest:WebView) => {
-      console.log('%c render.setStation', LOG,  station);
-      _station = station;
-      _guest = guest;
 
-      _guest.executeJavaScript(fs.readFileSync(path.dirname(require.main.filename) + '/lib/electronSafeIpc.js').toString());
+    set: (station:Station, webview:WebView) => {
+      console.log('%c render.setStation', LOG,  station);
+      _guest = new Guest(webview, station, utils);
+
+      SafeIPC.on("buttonStylesFetched", _guest.onButtonStylesFetched);
+      SafeIPC.on("buttonsFetched", _guest.onButtonsFetched)
     },
     on: _subscriber.on
   }
