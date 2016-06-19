@@ -11,9 +11,6 @@ let render:Render = (function () {
 
   const MAIN:IpcRenderer = require('electron').ipcRenderer;
   const SafeIPC:SafeIPC = require("electron-safe-ipc/host-webview");
-  const path = require('path');
-
-  const fs = require('fs');
 
   const subscriber = require('./js/render/subscriber');
   const Guest = require('./js/render/guest');

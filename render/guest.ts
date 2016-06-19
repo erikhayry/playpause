@@ -6,7 +6,6 @@ import {ElementStyle} from "../domain/elementStyle";
 const path = require('path');
 const fs = require('fs');
 
-
 const LOG = 'color: green; font-weight: bold;';
 
 //TODO require utils here
