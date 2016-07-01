@@ -1,12 +1,11 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
-import {PPWindowImpl} from "../domain/window";
-import {WebView, WebViewEvent} from "../domain/webView";
-import {Render} from "../domain/render";
-import {Station, ButtonPath, StationButtons} from "./stations";
+import {PPWindowImpl} from "../../domain/window";
+import {WebView, WebViewEvent} from "../../domain/webView";
+import {Render} from "../../domain/render";
+import {Station, ButtonPath, StationButtons} from "../domain/stations";
 import {ROUTER_DIRECTIVES} from "@angular/router";
 
 @Component({
-  selector: 'wv',
   template: `
     <div class="container-fluid">
       <div class="row">
@@ -22,18 +21,8 @@ import {ROUTER_DIRECTIVES} from "@angular/router";
           <a class="btn btn-block btn-primary" [routerLink]="['/add-station']">Add Station</a>
           <button class="btn btn-block btn-primary" (click)="openDevTools()">Open dev tools</button>
           
-          <div *ngIf="adding">
-            <hr>           
-            <div *ngIf="!newUrlLoaded">
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="URL" [(ngModel)]="newUrl">
-              </div>    
-              <button class="btn btn-block btn-primary" (click)="loadUrl(newUrl)">Load</button>
-            </div>
-            <button class="btn btn-block btn-primary" (click)="adding = false">Close</button>
-          </div> 
-        </div>              
-               
+
+        </div>                 
         <div class="col-sm-7 main">
           <h3 class="text-center">{{guestTitle}}</h3>
           <webview 
@@ -45,14 +34,13 @@ import {ROUTER_DIRECTIVES} from "@angular/router";
             disablewebsecurity
           ></webview>    
           </div>         
-        </div>
-        
+        </div>       
      </div>   
   `,
   directives: [ROUTER_DIRECTIVES],
 })
 
-export class WebviewComponent{
+export class RadioComponent{
   private LOG = 'color: red; font-weight: bold;';
   private guest:WebView;
   private render:Render;
@@ -60,21 +48,14 @@ export class WebviewComponent{
   currentStation:Station;
   guestTitle:string;
 
-  adding = false;
-  newUrlLoaded = false;
-  newUrl:string;
-  newName:string;
-  newPlay:string;
-  newPause:string;
-
   constructor() {
-    console.log('%c app > WebviewComponent', this.LOG);
+    console.log('%c app > RadioComponent', this.LOG);
     this.render = (<PPWindowImpl>window).render;
   }
 
   @ViewChild('quest') input:ElementRef;
   ngAfterViewInit() {
-    console.log('%c app > WebviewComponent.ngAfterViewInit', this.LOG, this.input);
+    console.log('%c app > RadioComponent.ngAfterViewInit', this.LOG, this.input);
     this.guest = this.input.nativeElement;
 
     this.render.getStations().then(stations => {
@@ -85,11 +66,11 @@ export class WebviewComponent{
 
     this.render.on('playpause', (e:WebViewEvent) => {
 
-      console.log('%c app > WebviewComponent render on playpause', this.LOG, e);
+      console.log('%c app > RadioComponent render on playpause', this.LOG, e);
     });
 
     this.guest.addEventListener('dom-ready', (e:WebViewEvent) => {
-      console.log('%c app > WebviewComponent webView on dom-ready', this.LOG, e);
+      console.log('%c app > RadioComponent webView on dom-ready', this.LOG, e);
       this.guestTitle = this.guest.getTitle();
       this.render.set(this.currentStation, this.guest);
       this.guest.openDevTools();
@@ -97,37 +78,20 @@ export class WebviewComponent{
   }
 
   openStation = (station:Station) => {
-    console.log('%c app > WebviewComponent.openStation', this.LOG, station);
+    console.log('%c app > RadioComponent.openStation', this.LOG, station);
     this.guest.src = station.url;
     this.currentStation = station;
   };
 
   removeStation = (url:string) => {
-    console.log('%c app > WebviewComponent.removeStation', this.LOG, url);
+    console.log('%c app > RadioComponent.removeStation', this.LOG, url);
     this.render.removeStation(url).then(stations => {
-      console.log('%c app > WebviewComponent.removeStation > removed', this.LOG, stations);
+      console.log('%c app > RadioComponent.removeStation > removed', this.LOG, stations);
       this.stations = stations;
     })
   };
 
   openDevTools = () => {
     this.guest.openDevTools();
-  };
-
-  loadUrl = (url:string):void => {
-
-  }
-
-  addStation = (newUrl:string, newName:string, newPlay:string, newPause:string) => {
-    console.log('%c app > WebviewComponent.addStation', this.LOG, newUrl, newName, newPlay, newPause);
-
-    let _play = new ButtonPath(newPlay, 'selector');
-    let _pause = new ButtonPath(newPause, 'selector');
-    let _buttons = new StationButtons(_play, _pause);
-
-    this.render.addStation(new Station(newName, newUrl, _buttons)).then(stations => {
-      console.log('%c app > WebviewComponent.removeStation > added', this.LOG, stations);
-      this.stations = stations;
-    })
   };
 }

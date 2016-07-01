@@ -1,9 +1,9 @@
 import { provideRouter, RouterConfig } from '@angular/router';
-import {WebviewComponent} from "./wv.component";
-import {AddStationComponent} from "./addStation.component";
+import {AddStationComponent} from "./views/addStation.component";
+import {RadioComponent} from "./views/radio.component";
 
 export const routes: RouterConfig = [
-  { path: '', component: WebviewComponent },
+  { path: '', component: RadioComponent },
   { path: 'add-station', component: AddStationComponent }
 ];
 
