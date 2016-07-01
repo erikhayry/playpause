@@ -65,7 +65,6 @@ export class RadioComponent{
     });
 
     this.render.on('playpause', (e:WebViewEvent) => {
-
       console.log('%c app > RadioComponent render on playpause', this.LOG, e);
     });
 
