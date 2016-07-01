@@ -3,13 +3,14 @@ import {PPWindowImpl} from "../domain/window";
 import {WebView, WebViewEvent} from "../domain/webView";
 import {Render} from "../domain/render";
 import {Station, ButtonPath, StationButtons} from "./stations";
+import {ROUTER_DIRECTIVES} from "@angular/router";
 
 @Component({
   selector: 'wv',
   template: `
     <div class="container-fluid">
       <div class="row">
-        <div class="col-sm-3 sidebar">
+        <div class="col-sm-5 sidebar">
           <ul class="nav nav-sidebar" >
               <li *ngFor="let station of stations">
                 {{station.name}} 
@@ -18,30 +19,22 @@ import {Station, ButtonPath, StationButtons} from "./stations";
               </li>
           </ul>
           <hr>
-          <button class="btn btn-block btn-primary" (click)="adding = true">Add Station</button>
+          <a class="btn btn-block btn-primary" [routerLink]="['/add-station']">Add Station</a>
           <button class="btn btn-block btn-primary" (click)="openDevTools()">Open dev tools</button>
           
           <div *ngIf="adding">
-            <hr>
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="URL" [(ngModel)]="newUrl">
-            </div>       
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Name" [(ngModel)]="newName">
-            </div>   
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="play button" [(ngModel)]="newPlay">
-            </div>   
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="pause button" [(ngModel)]="newPause">
-            </div> 
-            <br>
-            <button class="btn btn-block btn-primary" (click)="addStation(newUrl, newName, newPlay, newPause)" [disabled]="!newUrl">Add</button>
+            <hr>           
+            <div *ngIf="!newUrlLoaded">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="URL" [(ngModel)]="newUrl">
+              </div>    
+              <button class="btn btn-block btn-primary" (click)="loadUrl(newUrl)">Load</button>
+            </div>
             <button class="btn btn-block btn-primary" (click)="adding = false">Close</button>
           </div> 
         </div>              
                
-        <div class="col-sm-9 main">
+        <div class="col-sm-7 main">
           <h3 class="text-center">{{guestTitle}}</h3>
           <webview 
             #quest
@@ -55,7 +48,8 @@ import {Station, ButtonPath, StationButtons} from "./stations";
         </div>
         
      </div>   
-  `
+  `,
+  directives: [ROUTER_DIRECTIVES],
 })
 
 export class WebviewComponent{
@@ -65,7 +59,9 @@ export class WebviewComponent{
   stations:Array<Station>;
   currentStation:Station;
   guestTitle:string;
+
   adding = false;
+  newUrlLoaded = false;
   newUrl:string;
   newName:string;
   newPlay:string;
@@ -117,6 +113,10 @@ export class WebviewComponent{
   openDevTools = () => {
     this.guest.openDevTools();
   };
+
+  loadUrl = (url:string):void => {
+
+  }
 
   addStation = (newUrl:string, newName:string, newPlay:string, newPause:string) => {
     console.log('%c app > WebviewComponent.addStation', this.LOG, newUrl, newName, newPlay, newPause);
