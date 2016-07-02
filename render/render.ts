@@ -4,6 +4,7 @@ import {WebView} from "../domain/webView";
 import {IpcRendererEvent, IpcRenderer} from "../domain/electron";
 import {Station} from "../domain/station";
 import {Guest} from "../domain/guest";
+import {Subscriber} from "../domain/subscriber";
 
 let render:Render = (function () {
   const LOG = 'color: green; font-weight: bold;';
@@ -13,6 +14,7 @@ let render:Render = (function () {
 
   const subscriber = require('./js/render/subscriber');
   const Guest = require('./js/render/guest');
+  const AddGuest = require('./js/render/addGuest');
   const db = require('./js/render/db');
 
   let _guest:Guest;
@@ -31,10 +33,16 @@ let render:Render = (function () {
     addStation: db.add,
     removeStation: db.remove,
 
-    set: (station:Station, webview:WebView) => {
+    setStation: (station:Station, webview:WebView) => {
       console.log('%c render.setStation', LOG,  station);
       _guest = new Guest(webview, station);
     },
+
+    setAddStation: (webview:WebView) => {
+      console.log('%c render.setAddStation', LOG);
+      _guest = new AddGuest(webview, _subscriber);
+    },
+
     on: _subscriber.on
   }
 }());

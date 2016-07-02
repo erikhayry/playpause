@@ -71,7 +71,7 @@ export class RadioComponent{
     this.guest.addEventListener('dom-ready', (e:WebViewEvent) => {
       console.log('%c app > RadioComponent webView on dom-ready', this.LOG, e);
       this.guestTitle = this.guest.getTitle();
-      this.render.set(this.currentStation, this.guest);
+      this.render.setStation(this.currentStation, this.guest);
       this.guest.openDevTools();
     });
   }

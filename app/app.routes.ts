@@ -3,8 +3,8 @@ import {AddStationComponent} from "./views/addStation.component";
 import {RadioComponent} from "./views/radio.component";
 
 export const routes: RouterConfig = [
-  { path: 'start', component: RadioComponent },
-  { path: '', component: AddStationComponent }
+  { path: '', component: RadioComponent },
+  { path: 'add-station', component: AddStationComponent }
 ];
 
 export const APP_ROUTER_PROVIDERS = [
