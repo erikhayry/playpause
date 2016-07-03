@@ -17,9 +17,7 @@ const utils = require(root + '/js/render/utils.js');
 let addGuest = (webview:WebView, subscriber:Subscriber):any => {
   let _webview = webview;
   let _subscriber = subscriber;
-
-  _subscriber.publish('onButtonCandidatesFetched', [1,2,3])
-
+  
   _webview.executeJavaScript(fs.readFileSync(root + '/lib/electronSafeIpc.js').toString());
   _webview.executeJavaScript(fs.readFileSync(root + '/js/guest/guest-utils.js').toString());
   _webview.executeJavaScript('PP_EP.getButtonCandidates()');

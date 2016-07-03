@@ -23,7 +23,7 @@ import {PPWindowImpl} from "../domain/window";
     const PP_SCORE = 1;
 
     let _el = {
-      path: el.className ? el.className.replace(/ /g,'.') : '',
+      path: el.className && el.className.replace ? '.' + el.className.replace(/ /g,'.') : '',
       playButtonScore: 0,
       pauseButtonScore: 0,
       isPlayButton: false,

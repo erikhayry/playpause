@@ -22,7 +22,7 @@ import {ROUTER_DIRECTIVES} from "@angular/router";
       <p>Play buttons path: <span *ngIf="playButton">{{playButton.path}}</span></p>
       <p>Pause buttons path: <span *ngIf="pauseButton">{{pauseButton.path}}</span></p>
       
-      <button *ngIf="url && playButton && pauseButton && !added" class="btn btn-block btn-primary" (click)="addStation(url, 'New Station', playButton.path, pauseButton.path)">Add</button>
+      <button *ngIf="url && playButton && pauseButton && !added" class="btn btn-block btn-primary" (click)="addStation(url, 'New Station 2', playButton.path, pauseButton.path)">Add</button>
       
       <div *ngIf="added">
         <p>Stations added</p>
@@ -46,7 +46,7 @@ export class AddStationComponent{
   private LOG = 'color: red; font-weight: bold;';
   private render:Render;
   newStation:WebView;
-  url = 'https://soundcloud.com/jonwayne';
+  url = 'http://sverigesradio.se/';
   playButton:any;
   pauseButton:any;
   added = false;
@@ -61,16 +61,15 @@ export class AddStationComponent{
     console.log('%c app > AddStationComponent.ngAfterViewInit', this.LOG, this.input);
     this.newStation = this.input.nativeElement;
 
-    this.render.on('onButtonCandidatesFetched', (buttons:Array<any>) => {
-      console.log('%c app > AddStationComponent render on onButtonCandidatesFetched', this.LOG, buttons);
-
-      this.playButton = buttons.find(button => button.isPlayButton);
-      this.pauseButton = buttons.find(button => button.isPauseButton);
-    });
-
     this.newStation.addEventListener('dom-ready', (e:WebViewEvent) => {
       console.log('%c app > AddStationComponent webView on dom-ready', this.LOG, e);
-      this.render.setAddStation(this.newStation);
+
+      this.render.setAddStation(this.newStation).then((buttons:Array<any>) => {
+        console.log('%c app > AddStationComponent render on onButtonCandidatesFetched', this.LOG, buttons);
+        this.playButton = buttons.find(button => button.isPlayButton);
+        this.pauseButton = buttons.find(button => button.isPauseButton) || this.playButton;
+      });
+
       this.newStation.openDevTools();
     });
 
@@ -89,7 +88,7 @@ export class AddStationComponent{
     let _buttons = new StationButtons(_play, _pause);
 
     this.render.addStation(new Station(newName, newUrl, _buttons)).then(stations => {
-      console.log('%c app > AddStationComponent.removeStation > added', this.LOG, stations);
+      console.log('%c app > AddStationComponent.addStation > added', this.LOG, stations);
       this.added = true;
     })
   };

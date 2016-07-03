@@ -38,9 +38,15 @@ let render:Render = (function () {
       _guest = new Guest(webview, station);
     },
 
-    setAddStation: (webview:WebView) => {
+    setAddStation: (webview:WebView):Promise<Array<any>> => {
       console.log('%c render.setAddStation', LOG);
-      _guest = new AddGuest(webview, _subscriber);
+      return new Promise<any>((resolve, reject) => {
+        _guest = new AddGuest(webview, _subscriber);
+        _subscriber.on('onButtonCandidatesFetched', (buttons:Array<any>) => {
+          console.log('%c app > AddStationComponent render on onButtonCandidatesFetched', LOG, buttons);
+          resolve(buttons);
+        });
+      })
     },
 
     on: _subscriber.on
