@@ -1,56 +1,53 @@
 "use strict";
-import {Render} from "../domain/render";
-import {WebView} from "../domain/webView";
-import {IpcRendererEvent, IpcRenderer} from "../domain/electron";
 import {Station} from "../domain/station";
 import {Guest} from "../domain/guest";
-import {Subscriber} from "../domain/subscriber";
+import IpcRenderer = Electron.IpcRenderer;
+import IpcRendererEvent = Electron.IpcRendererEvent;
+import WebViewElement = Electron.WebViewElement;
 
-let render:Render = (function () {
-  const LOG = 'color: green; font-weight: bold;';
-  console.log('%c render', LOG);
+class Render {
+  private LOG = 'color: pink; font-weight: bold;';
+  private NAME = (where:string) => `%c render.${where}`;
+  private Subscriber = require('./app/render/subscriber');
+  private Guest = require('./app/render/guest');
+  private AddGuest = require('./app/render/addGuest');
+  private db = require('./app/render/db');
 
-  const MAIN:IpcRenderer = require('electron').ipcRenderer;
+  guest:Guest;
+  subscriber = new this.Subscriber();
 
-  const subscriber = require('./app/render/subscriber');
-  const Guest = require('./app/render/guest');
-  const AddGuest = require('./app/render/addGuest');
-  const db = require('./app/render/db');
+  constructor() {
+    const MAIN:IpcRenderer = require('electron').ipcRenderer;
+    let that = this;
 
-  let _guest:Guest;
-  let _subscriber = new subscriber();
-
-  //Events
-  MAIN.on('playpause', (event:IpcRendererEvent) => {
-    console.log('%c render on playpause', LOG, event);
-    _guest.onPlayPause();
-    _subscriber.publish('playpause', event);
-  });
-
-  return {
-    getStations: db.getAll,
-    getStation: db.get,
-    addStation: db.add,
-    removeStation: db.remove,
-
-    setStation: (station:Station, webview:WebView) => {
-      console.log('%c render.setStation', LOG,  station);
-      _guest = new Guest(webview, station);
-    },
-
-    setAddStation: (webview:WebView):Promise<Array<any>> => {
-      console.log('%c render.setAddStation', LOG);
-      return new Promise<any>((resolve, reject) => {
-        _guest = new AddGuest(webview, _subscriber);
-
-        //TODO use promise
-        _subscriber.on('onButtonCandidatesFetched', (buttons:Array<any>) => {
-          console.log('%c app > AddStationComponent render on onButtonCandidatesFetched', LOG, buttons);
-          resolve(buttons);
-        });
-      })
-    },
-
-    on: _subscriber.on
+    MAIN.on('playpause', (event:IpcRendererEvent) => {
+      console.log(this.NAME('playpause'), this.LOG, event);
+      that.guest.onPlayPause();
+      that.subscriber.publish('playpause', event);
+    });
   }
-}());
+
+  getStations = this.db.getAll;
+  getStation = this.db.get;
+  addStation = this.db.add;
+  removeStation = this.db.remove;
+  setStation = (station:Station, webview:WebViewElement) => {
+    console.log(this.NAME('setStation'), this.LOG, station);
+    this.guest = new this.Guest(webview, station);
+  };
+
+  setAddStation = (webview:WebViewElement):Promise<any[]> => {
+    console.log(this.NAME('setAddStation'), this.LOG);
+    return new Promise<any>((resolve, reject) => {
+      this.guest = new this.AddGuest(webview, this.subscriber);
+
+      //TODO use promise
+      this.subscriber.on('onButtonCandidatesFetched', (buttons:any[]) => {
+        console.log(this.NAME('onButtonCandidatesFetched'), this.LOG, buttons);
+        resolve(buttons);
+      })
+    })
+  };
+
+  on = this.subscriber.on
+}

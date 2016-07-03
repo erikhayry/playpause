@@ -1,19 +1,19 @@
 import {Guest} from "../domain/guest";
-import {WebView} from "../domain/webView";
+import WebViewElement = Electron.WebViewElement;
 import {Station} from "../domain/station";
 import {ElementStyle} from "../domain/elementStyle";
-import {SafeIPC} from "../domain/electron";
+import EventEmitter = Electron.EventEmitter;
 
 const path = require('path');
 const fs = require('fs');
-const safeIPC:SafeIPC = require("electron-safe-ipc/host-webview");
+const safeIPC:EventEmitter = require("electron-safe-ipc/host-webview");
 
 const root = path.dirname(require.main.filename);
 const LOG = 'color: green; font-weight: bold;';
 
 const utils = require(root + '/app/render/utils.js');
 
-let guest = (webview:WebView, station:Station):Guest => {
+let guest = (webview:WebViewElement, station:Station):Guest => {
   let _webview = webview;
   let _station = station;
 

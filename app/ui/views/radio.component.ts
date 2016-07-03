@@ -1,9 +1,10 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
 import {PPWindowImpl} from "../../domain/window";
-import {WebView, WebViewEvent} from "../../domain/webView";
 import {Render} from "../../domain/render";
 import {Station, ButtonPath, StationButtons} from "../domain/stations";
 import {ROUTER_DIRECTIVES} from "@angular/router";
+import WebViewElement = Electron.WebViewElement;
+import WebViewElementEvent = Electron.WebViewElement.Event;
 
 @Component({
   template: `
@@ -42,7 +43,7 @@ import {ROUTER_DIRECTIVES} from "@angular/router";
 
 export class RadioComponent{
   private LOG = 'color: red; font-weight: bold;';
-  private guest:WebView;
+  private guest:WebViewElement;
   private render:Render;
   stations:Array<Station>;
   currentStation:Station;
@@ -64,11 +65,11 @@ export class RadioComponent{
       this.guest.src = this.currentStation.url;
     });
 
-    this.render.on('playpause', (e:WebViewEvent) => {
+    this.render.on('playpause', (e:Event) => {
       console.log('%c app > RadioComponent render on playpause', this.LOG, e);
     });
 
-    this.guest.addEventListener('dom-ready', (e:WebViewEvent) => {
+    this.guest.addEventListener('dom-ready', (e:WebViewElementEvent) => {
       console.log('%c app > RadioComponent webView on dom-ready', this.LOG, e);
       this.guestTitle = this.guest.getTitle();
       this.render.setStation(this.currentStation, this.guest);

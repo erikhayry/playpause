@@ -19,11 +19,11 @@ export class ButtonPath{
 }
 
 export class Station {
-  name:String;
-  url:String;
+  name:string;
+  url:string;
   buttons:StationButtons;
 
-  constructor(name:String, url:String, buttons:StationButtons) {
+  constructor(name:string, url:string, buttons:StationButtons) {
       this.name = name;
       this.url = url;
       this.buttons = buttons;

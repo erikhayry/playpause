@@ -1,9 +1,9 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
 import {PPWindowImpl} from "../../domain/window";
-import {WebView, WebViewEvent} from "../../domain/webView";
 import {Render} from "../../domain/render";
 import {Station, ButtonPath, StationButtons} from "../domain/stations";
 import {ROUTER_DIRECTIVES} from "@angular/router";
+import WebViewElement = Electron.WebViewElement;
 
 @Component({
   template: `
@@ -45,7 +45,7 @@ import {ROUTER_DIRECTIVES} from "@angular/router";
 export class AddStationComponent{
   private LOG = 'color: red; font-weight: bold;';
   private render:Render;
-  newStation:WebView;
+  newStation:WebViewElement;
   url = 'http://sverigesradio.se/';
   playButton:any;
   pauseButton:any;
@@ -61,7 +61,7 @@ export class AddStationComponent{
     console.log('%c app > AddStationComponent.ngAfterViewInit', this.LOG, this.input);
     this.newStation = this.input.nativeElement;
 
-    this.newStation.addEventListener('dom-ready', (e:WebViewEvent) => {
+    this.newStation.addEventListener('dom-ready', (e:Event) => {
       console.log('%c app > AddStationComponent webView on dom-ready', this.LOG, e);
 
       this.render.setAddStation(this.newStation).then((buttons:Array<any>) => {

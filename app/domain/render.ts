@@ -1,10 +1,11 @@
 import {Station} from "./station";
-import {WebView} from "./webView";
-import {Subscriber} from "./subscriber";
+import WebViewElement = Electron.WebViewElement;
+import EventEmitter = Electron.EventEmitter;
+
 export interface Render{
   on(event:String, callback:any):any
-  setStation(station:Station, webview:WebView):void
-  setAddStation(webview:WebView):Promise<Array<any>>
+  setStation(station:Station, webview:WebViewElement):void
+  setAddStation(webview:WebViewElement):Promise<Array<any>>
   getStations():Promise<Array<Station>>
   getStation(url:string):Promise<Station>
   addStation(station:Station):Promise<Array<Station>>

@@ -1,29 +1,26 @@
 "use strict";
+import BrowserWindow = Electron.BrowserWindow;
+const globalShortcut:Electron.GlobalShortcut = require('global-shortcut');
 
-const globalShortcut = require('global-shortcut');
+export module Keybindings {
+  export function init(browserWindow:BrowserWindow) {
+    console.log('main > keybindings.init', browserWindow);
 
-let _init = (browserWindow) => {
-  console.log('main > keybindings.init', browserWindow);
+    globalShortcut.register('medianexttrack', () => {
+      console.log('main > keybindings > medianexttrack');
+    });
 
-  globalShortcut.register('medianexttrack', () => {
-    console.log('main > keybindings > medianexttrack');
-  });
-  
-  globalShortcut.register('mediaplaypause', (e) => {
-    console.log('main > keybindings > mediaplaypause');
-    browserWindow.webContents.send('playpause', e);
-  });
+    globalShortcut.register('mediaplaypause', () => {
+      console.log('main > keybindings > mediaplaypause');
+      browserWindow.webContents.send('playpause');
+    });
 
-  globalShortcut.register('mediaprevioustrack', () => {
-    console.log('main > keybindings > mediaprevioustrack');
-  });
+    globalShortcut.register('mediaprevioustrack', () => {
+      console.log('main > keybindings > mediaprevioustrack');
+    });
 
-  globalShortcut.register('mediastop', () => {
-    console.log('main > keybindings > mediastop');
-  });
-};
-
-
-module.exports = {
-    init: _init
-};
+    globalShortcut.register('mediastop', () => {
+      console.log('main > keybindings > mediastop');
+    });
+  }
+}

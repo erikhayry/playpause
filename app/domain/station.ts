@@ -13,7 +13,7 @@ export interface StationButtons{
 }
 
 export interface Station {
-  name:String
-  url:String
+  name:string
+  url:string
   buttons:StationButtons;
 }

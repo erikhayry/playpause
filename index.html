@@ -8,7 +8,10 @@
 
     <!--load RENDER-->
     <script src="app/render/render.js"></script>
-
+    <script>
+      //INIT TODO beter way to init?
+      window.render = new Render();
+    </script>
     <!-- Polyfill(s) for older browsers -->
     <script src="node_modules/core-js/client/shim.min.js"></script>
 
