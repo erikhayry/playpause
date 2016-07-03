@@ -11,14 +11,14 @@ const safeIPC:SafeIPC = require("electron-safe-ipc/host-webview");
 const root = path.dirname(require.main.filename);
 const LOG = 'color: green; font-weight: bold;';
 
-const utils = require(root + '/js/render/utils.js');
+const utils = require(root + '/app/render/utils.js');
 
 let guest = (webview:WebView, station:Station):Guest => {
   let _webview = webview;
   let _station = station;
 
-  _webview.executeJavaScript(fs.readFileSync(root + '/lib/electronSafeIpc.js').toString());
-  _webview.executeJavaScript(fs.readFileSync(root + '/js/guest/guest-utils.js').toString());
+  _webview.executeJavaScript(fs.readFileSync(root + '/app/guest/lib/electronSafeIpc.js').toString());
+  _webview.executeJavaScript(fs.readFileSync(root + '/app/guest/guest-utils.js').toString());
   _webview.executeJavaScript('PP_EP.getButtons()');
 
   safeIPC.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) =>

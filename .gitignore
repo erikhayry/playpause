@@ -19,6 +19,6 @@ out
 !typings/typings.d.ts
 !wallaby.js
 !/main.js
-!main/**
 !lib/**
 !test/**/*
+!guest/lib/**/*.js

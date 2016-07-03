@@ -1,12 +1,11 @@
 "use strict";
-
 const app = require('app');
 const BrowserWindow = require('browser-window');
 const path = require('path');
 
-const keybindings = require('./main/keybindings')
-const settings = require('./main/settings')
-const plugins = require('./main/plugins')
+const keybindings = require('./keybindings');
+const settings = require('./settings');
+const plugins = require('./plugins');
 
 //Init
 plugins.init(app, path);
@@ -22,7 +21,7 @@ app.on('window-all-closed', () => {
 app.on('ready', () => {
   console.log('main: on ready');
   let browserWindow = new BrowserWindow(settings.browserWindow);
-  browserWindow.loadUrl('file://' + __dirname + '/index.html');
+  browserWindow.loadUrl('file://' + __dirname + '/../../index.html');
   keybindings.init(browserWindow);
 
   browserWindow.openDevTools();

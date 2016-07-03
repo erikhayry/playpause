@@ -12,10 +12,10 @@ let render:Render = (function () {
 
   const MAIN:IpcRenderer = require('electron').ipcRenderer;
 
-  const subscriber = require('./js/render/subscriber');
-  const Guest = require('./js/render/guest');
-  const AddGuest = require('./js/render/addGuest');
-  const db = require('./js/render/db');
+  const subscriber = require('./app/render/subscriber');
+  const Guest = require('./app/render/guest');
+  const AddGuest = require('./app/render/addGuest');
+  const db = require('./app/render/db');
 
   let _guest:Guest;
   let _subscriber = new subscriber();
@@ -42,6 +42,8 @@ let render:Render = (function () {
       console.log('%c render.setAddStation', LOG);
       return new Promise<any>((resolve, reject) => {
         _guest = new AddGuest(webview, _subscriber);
+
+        //TODO use promise
         _subscriber.on('onButtonCandidatesFetched', (buttons:Array<any>) => {
           console.log('%c app > AddStationComponent render on onButtonCandidatesFetched', LOG, buttons);
           resolve(buttons);

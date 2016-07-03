@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron main.js",
+    "start": "electron app/main/main.js",
     "lint": "tslint ./app/**/*.ts -t verbose",
     "postinstall": "typings install",
     "tsc": "tsc",
