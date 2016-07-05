@@ -4,21 +4,28 @@ import {Guest} from "../domain/guest";
 import IpcRenderer = Electron.IpcRenderer;
 import IpcRendererEvent = Electron.IpcRendererEvent;
 import WebViewElement = Electron.WebViewElement;
+import {Subscriber} from "../domain/subscriber";
+import {iLogger} from "../domain_/iLogger";
 
 class Render {
   private LOG = 'color: pink; font-weight: bold;';
   private NAME = (where:string) => `%c render.${where}`;
-  private Subscriber = require('./app/render/subscriber');
   private Guest = require('./app/render/guest');
   private AddGuest = require('./app/render/addGuest');
   private db = require('./app/render/db');
 
   guest:Guest;
-  subscriber = new this.Subscriber();
+  subscriber:Subscriber;
+  logger:iLogger;
 
   constructor() {
     const MAIN:IpcRenderer = require('electron').ipcRenderer;
     let that = this;
+    const Logger = require('./app/domain_/Logger');
+    const Subscriber = require('./app/render/subscriber');
+
+    this.subscriber = new Subscriber();
+    this.logger = new Logger('Render');
 
     MAIN.on('playpause', (event:IpcRendererEvent) => {
       console.log(this.NAME('playpause'), this.LOG, event);
@@ -32,7 +39,7 @@ class Render {
   addStation = this.db.add;
   removeStation = this.db.remove;
   setStation = (station:Station, webview:WebViewElement) => {
-    console.log(this.NAME('setStation'), this.LOG, station);
+    this.logger.log('setStation', station);
     this.guest = new this.Guest(webview, station);
   };
 
@@ -49,5 +56,7 @@ class Render {
     })
   };
 
-  on = this.subscriber.on
+  on = (topic:string, listener:any) =>{
+    return this.subscriber.on(topic, listener);
+  }
 }

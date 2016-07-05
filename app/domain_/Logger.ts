@@ -1,17 +1,15 @@
-export class Logger{
-  private style:String;
-  name:String;
+import {iLogger} from "../domain_/iLogger";
 
+export class Logger implements iLogger{
+  name:string;
 
-  constructor(name:String, color:String) {
+  constructor(name:string) {
       this.name = name;
-      this.style = `color: ${color}; font-weight: bold;`;
-
-
-
   }
 
-  log = (...args:any[]):void =>{
-    console.log(this.style, this.name, ...args)
+  log(where:string, ...args:any[]){
+    console.log(`${this.name}.${where}`, args)
   }
 }
+
+module.exports = Logger;

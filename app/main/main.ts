@@ -5,7 +5,6 @@ import {Settings} from "./settings";
 const app = require('app');
 const BrowserWindow = require('browser-window');
 
-const keybindings = require('./keybindings');
 const settings = require('./settings');
 
 
