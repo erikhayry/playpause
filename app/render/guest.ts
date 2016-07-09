@@ -1,70 +1,71 @@
-import {Guest} from "../domain/guest";
 import WebViewElement = Electron.WebViewElement;
 import {Station} from "../domain/station";
 import {ElementStyle} from "../domain/elementStyle";
 import EventEmitter = Electron.EventEmitter;
+import {Logger} from "../domain_/Logger";
 
 const path = require('path');
 const fs = require('fs');
 const safeIPC:EventEmitter = require("electron-safe-ipc/host-webview");
 
 const root = path.dirname(require.main.filename);
-const LOG = 'color: green; font-weight: bold;';
 
 const utils = require(root + '/app/render/utils.js');
 
-let guest = (webview:WebViewElement, station:Station):Guest => {
-  let _webview = webview;
-  let _station = station;
+export class Guest {
+  private logger = new Logger('Guest', 'green');
+  private webview:WebViewElement;
+  private station:Station;
 
-  _webview.executeJavaScript(fs.readFileSync(root + '/app/guest/lib/electronSafeIpc.js').toString());
-  _webview.executeJavaScript(fs.readFileSync(root + '/app/guest/guest-utils.js').toString());
-  _webview.executeJavaScript('PP_EP.getButtons()');
+  constructor(webview:Electron.WebViewElement, station:Station) {
+    this.webview = webview;
+    this.station = station;
 
-  safeIPC.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) =>
-    onButtonStylesFetched(playBtnStyle, pauseBtnStyles)
-  );
+    this.webview.executeJavaScript(fs.readFileSync(root + '/app/guest/lib/electronSafeIpc.js').toString());
+    this.webview.executeJavaScript(fs.readFileSync(root + '/app/guest/guest-utils.js').toString());
+    this.webview.executeJavaScript('PP_EP.getButtons()');
 
-  safeIPC.on("buttonsFetched", (buttons:Array<any>) => onButtonsFetched(buttons));
+    safeIPC.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) =>
+      this.onButtonStylesFetched(playBtnStyle, pauseBtnStyles)
+    );
 
-  let onButtonStylesFetched = (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle):void => {
-    console.log('%c render on buttonStylesFetched', LOG, !!playBtnStyle, !!pauseBtnStyles);
-    switch(utils.getGuestState(playBtnStyle, pauseBtnStyles)){
+    safeIPC.on("buttonsFetched", (buttons:Array<any>) => this.onButtonsFetched(buttons));
+  }
+
+  private onButtonStylesFetched = (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle):void => {
+   this.logger.log('onButtonStylesFetched', !!playBtnStyle, !!pauseBtnStyles);
+    switch (utils.getGuestState(playBtnStyle, pauseBtnStyles)) {
       case 'playing':
-        _webview.executeJavaScript(utils.click(_station.buttons.pause));
+        this.webview.executeJavaScript(utils.click(this.station.buttons.pause));
         break;
       case 'paused':
       default:
-        _webview.executeJavaScript(utils.click(_station.buttons.play))
+        this.webview.executeJavaScript(utils.click(this.station.buttons.play))
     }
   };
 
-  let onButtonsFetched = (buttons:Array<any>):void => {
-    console.log('%c render onButtonsFetched', LOG, buttons);
+  private onButtonsFetched = (buttons:Array<any>):void => {
+    this.logger.log('onButtonsFetched', buttons);
   };
 
-  return {
-    getButtons: ():Array<any> => {
-        return null;
-    },
+  getButtons():Array<any> {
+    return null;
+  }
 
-    getStatus: () => {
-        return '';
-    },
+  getStatus() {
+    return '';
+  }
 
-    onPlayPause: ():void => {
-      if(_station){
-        if(_station.buttons.play !== _station.buttons.pause){
-          let _fetchButtons = 'electronSafeIpc.send("buttonStylesFetched", ' + utils.getComputedStyle(_station.buttons.play) + ',' + utils.getComputedStyle(_station.buttons.pause) + ')';
-          console.log('%c ' + _fetchButtons, LOG);
-          _webview.executeJavaScript(_fetchButtons);
-        }
-        else{
-          _webview.executeJavaScript(utils.click(_station.buttons.play))
-        }
+  onPlayPause():void {
+    if (this.station) {
+      if (this.station.buttons.play !== this.station.buttons.pause) {
+        let fetchButtons = 'electronSafeIpc.send("buttonStylesFetched", ' + utils.getComputedStyle(this.station.buttons.play) + ',' + utils.getComputedStyle(this.station.buttons.pause) + ')';
+        this.logger.log('onPlayPause', fetchButtons);
+        this.webview.executeJavaScript(fetchButtons);
+      }
+      else {
+        this.webview.executeJavaScript(utils.click(this.station.buttons.play))
       }
     }
   }
-};
-
-module.exports = guest;
+}

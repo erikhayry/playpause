@@ -1,36 +1,29 @@
-"use strict";
-import {Station} from "../domain/station";
-import {Guest} from "../domain/guest";
+'use strict';
+import {Station} from './app/domain/station';
 import IpcRenderer = Electron.IpcRenderer;
 import IpcRendererEvent = Electron.IpcRendererEvent;
 import WebViewElement = Electron.WebViewElement;
 
-import {Logger as iLogger} from "../domain_/Logger";
-const Logger = require('./app/domain_/Logger');
-
-import {Subscriber as iSubscriber} from "./subscriber";
-const Subscriber = require('./app/render/subscriber');
+import {Logger} from './app/domain_/Logger';
+import {Subscriber} from './app/render/subscriber';
+import {Guest} from './app/render/guest';
 
 class Render {
-  private Guest = require('./app/render/guest');
   private AddGuest = require('./app/render/addGuest');
   private db = require('./app/render/db');
 
   guest:Guest;
-  subscriber:iSubscriber;
-  logger:iLogger;
+  subscriber:Subscriber;
+  logger = new Logger('Render', 'pink');
 
   constructor() {
     const MAIN:IpcRenderer = require('electron').ipcRenderer;
-    let that = this;
-
     this.subscriber = new Subscriber();
-    this.logger = new Logger('Render', 'pink');
 
     MAIN.on('playpause', (event:IpcRendererEvent) => {
       this.logger.log('playpause', event);
-      that.guest.onPlayPause();
-      that.subscriber.publish('playpause', event);
+      this.guest.onPlayPause();
+      this.subscriber.publish('playpause', event);
     });
   }
 
@@ -41,7 +34,7 @@ class Render {
 
   setStation = (station:Station, webview:WebViewElement) => {
     this.logger.log('setStation', station);
-    this.guest = new this.Guest(webview, station);
+    this.guest = new Guest(webview, station);
   };
 
   setAddStation = (webview:WebViewElement):Promise<any[]> => {

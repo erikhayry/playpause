@@ -1,39 +1,35 @@
-import {Subscriber as Sub} from "../domain/subscriber";
+import {Logger} from "../domain_/Logger";
 
-let Subscriber = ():Sub => {
-  const LOG = 'color: brown; font-weight: bold;';
+export class Subscriber {
+  private logger = new Logger('Subscriber', 'brown');
+  private topics = {};
+  private hasOwnProperty = this.topics.hasOwnProperty;
 
-  console.log('%c render > subscriber', LOG);
-  let _topics = {};
-  let _hasOwnProperty = _topics.hasOwnProperty;
+  constructor() {
 
-  return {
-    on: (topic:string, listener:any) => {
-      console.log('%c render > subscriber.on', LOG, topic, typeof listener);
-
-      if(!_hasOwnProperty.call(_topics, topic)) _topics[topic] = [];
-      let index = _topics[topic].push(listener) -1;
-
-      return {
-        remove: function(topic:string) {
-          console.log('%c render > subscriber.on.delete', LOG, topic);
-          console.log(_topics)
-          delete _topics[topic][index];
-        }
-      };
-    },
-
-    publish: (topic:string, info:any) => {
-      console.log('%c render > subscriber.on', LOG, topic, info);
-
-      if(!_hasOwnProperty.call(_topics, topic)) return;
-
-      _topics[topic].forEach(function(item:Function) {
-        item(info != undefined ? info : {});
-      });
-    }
   }
-};
 
+  on(topic:string, listener:any){
+    this.logger.log('on', topic, typeof listener);
 
-module.exports = Subscriber;
+    if(!this.hasOwnProperty.call(this.topics, topic)) this.topics[topic] = [];
+    let index = this.topics[topic].push(listener) -1;
+
+    return {
+        remove: function(topic:string) {
+        this.logger.log('on.delete', topic);
+        delete this.topics[topic][index];
+      }
+    };
+  };
+
+  publish(topic:string, info:any){
+    this.logger.log('on', topic, info);
+
+    if(!this.hasOwnProperty.call(this.topics, topic)) return;
+
+    this.topics[topic].forEach(function(item:Function) {
+      item(info != undefined ? info : {});
+    });
+  };
+}
