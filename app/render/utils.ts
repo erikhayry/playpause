@@ -1,10 +1,11 @@
 import {ElementStyle} from "../domain/elementStyle";
 import {ButtonPath} from "../domain/station";
+import {Logger} from "../domain_/Logger";
 
-let Utils = (() => {
-  const LOG = 'color: purple; font-weight: bold;';
+export module Utils{
+  let logger = new Logger('Utils', 'orange');
 
-  let _getElement = (path:ButtonPath) => {
+  let getElementQuery = (path:ButtonPath) => {
     if(path.type === 'selector'){
       return 'document.querySelectorAll("' + path.value +'")[0]'
     }
@@ -14,33 +15,29 @@ let Utils = (() => {
     }
   };
 
-  return {
-    click(buttonPath:ButtonPath):string{
-      console.log('%c Utils.click', LOG, buttonPath);
-      return _getElement(buttonPath) + '.click()'
-    },
+  export function click(buttonPath:ButtonPath):string{
+    logger.log('click', buttonPath);
+    return getElementQuery(buttonPath) + '.click()'
+  }
 
-    getGuestState(playBtnEl:ElementStyle, pauseBtnEl:ElementStyle):string{
-      console.log('%c Utils.getGuestState', LOG, playBtnEl.display, pauseBtnEl.display);
+  export function getGuestState(playBtnEl:ElementStyle, pauseBtnEl:ElementStyle):string{
+    logger.log('getGuestState', playBtnEl.display, pauseBtnEl.display);
 
-      if(playBtnEl.display === 'none'){
-        return 'playing'
-      }
-      else{
-        return'paused'
-      }
-    },
-
-    getElement(path:ButtonPath){
-      console.log('%c Utils.getElement', LOG, path);
-      return _getElement(path)
-    },
-
-    getComputedStyle(path:ButtonPath){
-      console.log('%c Utils.getComputedStyle', LOG, path);
-      return 'window.getComputedStyle(' + _getElement(path) + ')'
+    if(playBtnEl.display === 'none'){
+      return 'playing'
+    }
+    else{
+      return'paused'
     }
   }
-})();
 
-module.exports = Utils;
+  export function getElement(path:ButtonPath){
+    logger.log('getElement', path);
+    return getElementQuery(path)
+  }
+
+  export function getComputedStyle(path:ButtonPath){
+    logger.log('getComputedStyle', path);
+    return 'window.getComputedStyle(' + getElementQuery(path) + ')'
+  }
+}

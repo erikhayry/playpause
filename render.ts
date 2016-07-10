@@ -7,12 +7,13 @@ import WebViewElement = Electron.WebViewElement;
 import {Logger} from './app/domain_/Logger';
 import {Subscriber} from './app/render/subscriber';
 import {Guest} from './app/render/guest';
+import {AddGuest} from './app/render/addGuest';
 
 class Render {
-  private AddGuest = require('./app/render/addGuest');
   private db = require('./app/render/db');
 
   guest:Guest;
+  addGuest:AddGuest;
   subscriber:Subscriber;
   logger = new Logger('Render', 'pink');
 
@@ -39,15 +40,8 @@ class Render {
 
   setAddStation = (webview:WebViewElement):Promise<any[]> => {
     this.logger.log('setAddStation');
-    return new Promise<any>((resolve, reject) => {
-      this.guest = new this.AddGuest(webview, this.subscriber);
-
-      //TODO use promise
-      this.subscriber.on('onButtonCandidatesFetched', (buttons:any[]) => {
-        this.logger.log('onButtonCandidatesFetched', buttons);
-        resolve(buttons);
-      })
-    })
+    this.addGuest = new AddGuest(webview);
+    return this.addGuest.getButtonsCanidates();
   };
 
   on = (topic:string, listener:any) =>{
