@@ -1,5 +1,5 @@
 'use strict';
-import {Station} from './app/domain/station';
+import {Station} from './app/ui/domain/stations';
 import IpcRenderer = Electron.IpcRenderer;
 import IpcRendererEvent = Electron.IpcRendererEvent;
 import WebViewElement = Electron.WebViewElement;
@@ -9,7 +9,7 @@ import {Subscriber} from './app/render/subscriber';
 import {Guest} from './app/render/guest';
 import {AddGuest} from './app/render/addGuest';
 
-class Render {
+export class Render {
   private db = require('./app/render/db');
 
   guest:Guest;

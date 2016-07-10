@@ -1,10 +1,11 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
 import {PPWindowImpl} from "../../domain/window";
-import {Render} from "../../domain/render";
+import {Render} from "../../../render";
 import {Station, ButtonPath, StationButtons} from "../domain/stations";
 import {ROUTER_DIRECTIVES} from "@angular/router";
 import WebViewElement = Electron.WebViewElement;
 import WebViewElementEvent = Electron.WebViewElement.Event;
+import {Logger} from "../../domain_/Logger";
 
 @Component({
   template: `
@@ -38,11 +39,11 @@ import WebViewElementEvent = Electron.WebViewElement.Event;
         </div>       
      </div>   
   `,
-  directives: [ROUTER_DIRECTIVES],
+  directives: [ROUTER_DIRECTIVES]
 })
 
 export class RadioComponent{
-  private LOG = 'color: red; font-weight: bold;';
+  private logger = new Logger('RadioComponent', 'red');
   private guest:WebViewElement;
   private render:Render;
   stations:Array<Station>;
@@ -50,27 +51,26 @@ export class RadioComponent{
   guestTitle:string;
 
   constructor() {
-    console.log('%c app > RadioComponent', this.LOG);
     this.render = (<PPWindowImpl>window).render;
   }
 
   @ViewChild('quest') input:ElementRef;
   ngAfterViewInit() {
-    console.log('%c app > RadioComponent.ngAfterViewInit', this.LOG, this.input);
+    this.logger.log('ngAfterViewInit', this.input);
     this.guest = this.input.nativeElement;
 
-    this.render.getStations().then(stations => {
+    this.render.getStations().then((stations:Station[]) => {
       this.stations = stations;
       this.currentStation = this.stations[0];
       this.guest.src = this.currentStation.url;
     });
 
     this.render.on('playpause', (e:Event) => {
-      console.log('%c app > RadioComponent render on playpause', this.LOG, e);
+      this.logger.log('onPlaypause', e);
     });
 
     this.guest.addEventListener('dom-ready', (e:WebViewElementEvent) => {
-      console.log('%c app > RadioComponent webView on dom-ready', this.LOG, e);
+      this.logger.log('onDom-ready', e);
       this.guestTitle = this.guest.getTitle();
       this.render.setStation(this.currentStation, this.guest);
       this.guest.openDevTools();
@@ -78,15 +78,15 @@ export class RadioComponent{
   }
 
   openStation = (station:Station) => {
-    console.log('%c app > RadioComponent.openStation', this.LOG, station);
+    this.logger.log('openStation', station);
     this.guest.src = station.url;
     this.currentStation = station;
   };
 
   removeStation = (url:string) => {
-    console.log('%c app > RadioComponent.removeStation', this.LOG, url);
-    this.render.removeStation(url).then(stations => {
-      console.log('%c app > RadioComponent.removeStation > removed', this.LOG, stations);
+    this.logger.log('removeStation', url);
+    this.render.removeStation(url).then((stations:Station[]) => {
+      this.logger.log('removeStation > removed', stations);
       this.stations = stations;
     })
   };

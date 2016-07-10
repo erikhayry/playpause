@@ -1,15 +1,16 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
 import {PPWindowImpl} from "../../domain/window";
-import {Render} from "../../domain/render";
+import {Render} from "../../../render";
 import {Station, ButtonPath, StationButtons} from "../domain/stations";
 import {ROUTER_DIRECTIVES} from "@angular/router";
 import WebViewElement = Electron.WebViewElement;
+import {Logger} from "../../domain_/Logger";
 
 @Component({
   template: `
     <div class="container-fluid">
       <h1>Add Station</h1>
-      <a class="btn btn-block btn-primary" [routerLink]="['/']">Back</a>
+      <a class="btn btn-block btn-primary" [routerLink]="['/play-station']">Back</a>
       
       <hr>
       <div class="input-group">
@@ -22,11 +23,11 @@ import WebViewElement = Electron.WebViewElement;
       <p>Play buttons path: <span *ngIf="playButton">{{playButton.path}}</span></p>
       <p>Pause buttons path: <span *ngIf="pauseButton">{{pauseButton.path}}</span></p>
       
-      <button *ngIf="url && playButton && pauseButton && !added" class="btn btn-block btn-primary" (click)="addStation(url, 'New Station 2', playButton.path, pauseButton.path)">Add</button>
+      <button *ngIf="url && playButton && pauseButton && !added" class="btn btn-block btn-primary" (click)="addStation(url, url, playButton.path, pauseButton.path)">Add</button>
       
       <div *ngIf="added">
         <p>Stations added</p>
-        <a class="btn btn-block btn-primary" [routerLink]="['/']">Ok</a>    
+        <a class="btn btn-block btn-primary" [routerLink]="['/play-station']">Ok</a>    
       </div>
       
       <webview 
@@ -43,7 +44,7 @@ import WebViewElement = Electron.WebViewElement;
 })
 
 export class AddStationComponent{
-  private LOG = 'color: red; font-weight: bold;';
+  private logger = new Logger('AddStationComponent', 'red');
   private render:Render;
   newStation:WebViewElement;
   url = 'http://sverigesradio.se/';
@@ -52,20 +53,19 @@ export class AddStationComponent{
   added = false;
 
   constructor() {
-    console.log('%c app > AddStationComponent', this.LOG);
     this.render = (<PPWindowImpl>window).render;
   }
 
   @ViewChild('newStation') input:ElementRef;
   ngAfterViewInit() {
-    console.log('%c app > AddStationComponent.ngAfterViewInit', this.LOG, this.input);
+    this.logger.log('ngAfterViewInit', this.input);
     this.newStation = this.input.nativeElement;
 
     this.newStation.addEventListener('dom-ready', (e:Event) => {
-      console.log('%c app > AddStationComponent webView on dom-ready', this.LOG, e);
+      this.logger.log('webView on dom-ready', e);
 
       this.render.setAddStation(this.newStation).then((buttons:Array<any>) => {
-        console.log('%c app > AddStationComponent render on onButtonCandidatesFetched', this.LOG, buttons);
+        this.logger.log('render on onButtonCandidatesFetched', buttons);
         this.playButton = buttons.find(button => button.isPlayButton);
         this.pauseButton = buttons.find(button => button.isPauseButton) || this.playButton;
       });
@@ -76,19 +76,19 @@ export class AddStationComponent{
   }
 
   loadUrl = (url:string) => {
-    console.log('%c app > AddStationComponent.loadUrl', this.LOG, url);
+    this.logger.log('loadUrl', url);
     this.newStation.src = url;
   };
 
   addStation = (newUrl:string, newName:string, newPlay:string, newPause:string) => {
-    console.log('%c app > AddStationComponent.addStation', this.LOG, newUrl, newName, newPlay, newPause);
+    this.logger.log('addStation', newUrl, newName, newPlay, newPause);
 
     let _play = new ButtonPath(newPlay, 'selector');
     let _pause = new ButtonPath(newPause, 'selector');
     let _buttons = new StationButtons(_play, _pause);
 
-    this.render.addStation(new Station(newName, newUrl, _buttons)).then(stations => {
-      console.log('%c app > AddStationComponent.addStation > added', this.LOG, stations);
+    this.render.addStation(new Station(newName, newUrl, _buttons)).then((stations:Station[]) => {
+      this.logger.log('addStation > added', stations);
       this.added = true;
     })
   };

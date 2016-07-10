@@ -20,7 +20,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', () => {
-  console.log('main: on ready');
+  console.log('main.ready');
   let browserWindow = new BrowserWindow(Settings.browserWindow);
   browserWindow.loadUrl('file://' + __dirname + '/../../index.html');
   Keybindings.init(browserWindow);

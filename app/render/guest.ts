@@ -1,7 +1,6 @@
 import WebViewElement = Electron.WebViewElement;
-import {Station} from "../domain/station";
-import {ElementStyle} from "../domain/elementStyle";
 import EventEmitter = Electron.EventEmitter;
+import {Station} from "../ui/domain/stations";
 import {Logger} from "../domain_/Logger";
 import {Utils} from "./utils";
 
@@ -18,19 +17,19 @@ export class Guest {
   constructor(webview:Electron.WebViewElement, station:Station) {
     this.webview = webview;
     this.station = station;
-    
+
     this.webview.executeJavaScript(fs.readFileSync(root + '/app/guest/lib/electronSafeIpc.js').toString());
     this.webview.executeJavaScript(fs.readFileSync(root + '/app/guest/guest-utils.js').toString());
     this.webview.executeJavaScript('PP_EP.getButtons()');
 
-    safeIPC.on("buttonStylesFetched", (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle) =>
+    safeIPC.on("buttonStylesFetched", (playBtnStyle:CSSStyleDeclaration, pauseBtnStyles:CSSStyleDeclaration) =>
       this.onButtonStylesFetched(playBtnStyle, pauseBtnStyles)
     );
 
     safeIPC.on("buttonsFetched", (buttons:Array<any>) => this.onButtonsFetched(buttons));
   }
 
-  private onButtonStylesFetched = (playBtnStyle:ElementStyle, pauseBtnStyles:ElementStyle):void => {
+  private onButtonStylesFetched = (playBtnStyle:CSSStyleDeclaration, pauseBtnStyles:CSSStyleDeclaration):void => {
    this.logger.log('onButtonStylesFetched', !!playBtnStyle, !!pauseBtnStyles);
     switch (Utils.getGuestState(playBtnStyle, pauseBtnStyles)) {
       case 'playing':

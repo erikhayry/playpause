@@ -1,4 +1,4 @@
-import {Station} from "../domain/station";
+import {Station} from "../ui/domain/stations";
 
 const remote = require('electron').remote
 const app = remote.app;

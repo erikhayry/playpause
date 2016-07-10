@@ -1,7 +1,6 @@
 import WebViewElement = Electron.WebViewElement;
 import EventEmitter = Electron.EventEmitter;
 import {Logger} from "../domain_/Logger";
-import {Subscriber} from "./subscriber";
 
 const path = require('path');
 const fs = require('fs');

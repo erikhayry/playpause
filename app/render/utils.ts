@@ -1,5 +1,4 @@
-import {ElementStyle} from "../domain/elementStyle";
-import {ButtonPath} from "../domain/station";
+import {ButtonPath} from "../ui/domain/stations";
 import {Logger} from "../domain_/Logger";
 
 export module Utils{
@@ -20,7 +19,7 @@ export module Utils{
     return getElementQuery(buttonPath) + '.click()'
   }
 
-  export function getGuestState(playBtnEl:ElementStyle, pauseBtnEl:ElementStyle):string{
+  export function getGuestState(playBtnEl:CSSStyleDeclaration, pauseBtnEl:CSSStyleDeclaration):string{
     logger.log('getGuestState', playBtnEl.display, pauseBtnEl.display);
 
     if(playBtnEl.display === 'none'){

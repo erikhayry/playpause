@@ -1,4 +1,4 @@
-import {Render} from "./render";
+import {Render} from "../../render";
 export interface PPWindowImpl extends Window {
   render:Render
   PP_EP:any

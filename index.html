@@ -22,7 +22,11 @@
     <!--Load UI-->
     <script src="systemjs.config.js"></script>
     <script>
-      System.import('ui').catch(function(err){ console.error(err); });
+      System.import('ui')
+        .then(function(){
+          //console.clear();
+        })
+        .catch(function(err){ console.error(err); });
     </script>
   </head>
 
