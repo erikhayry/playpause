@@ -27,4 +27,5 @@ describe('Subscriber', () => {
     assert.equal(_testRet2, 'testVal');
     assert.equal(_testRet3, 'testVal3');
   });
+  
 });

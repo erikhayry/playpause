@@ -8,10 +8,11 @@ import {Logger} from './app/domain_/Logger';
 import {Subscriber} from './app/render/subscriber';
 import {Guest} from './app/render/guest';
 import {AddGuest} from './app/render/addGuest';
+import {DB} from './app/render/db';
 
+
+//TODO handle exports error on load
 export class Render {
-  private db = require('./app/render/db');
-
   guest:Guest;
   addGuest:AddGuest;
   subscriber:Subscriber;
@@ -28,10 +29,10 @@ export class Render {
     });
   }
 
-  getStations = this.db.getAll;
-  getStation = this.db.get;
-  addStation = this.db.add;
-  removeStation = this.db.remove;
+  getStations = DB.getAll;
+  getStation = DB.get;
+  addStation = DB.add;
+  removeStation = DB.remove;
 
   setStation = (station:Station, webview:WebViewElement) => {
     this.logger.log('setStation', station);

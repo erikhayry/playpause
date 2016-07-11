@@ -9,8 +9,8 @@
     <!--load RENDER-->
     <script src="render.js"></script>
     <script>
-      //INIT TODO beter way to init?
-      window.render = new Render();
+      //INIT TODO better way to init?
+
     </script>
     <!-- Polyfill(s) for older browsers -->
     <script src="node_modules/core-js/client/shim.min.js"></script>
@@ -25,6 +25,7 @@
       System.import('ui')
         .then(function(){
           //console.clear();
+          window.render = new Render();
         })
         .catch(function(err){ console.error(err); });
     </script>
