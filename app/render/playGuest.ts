@@ -3,14 +3,15 @@
   import {Station} from "../domain/station";
   import {Utils} from "./utils";
   import {Guest} from "./guest";
+  import {Subscriber} from "./subscriber";
 
   const safeIPC:EventEmitter = require("electron-safe-ipc/host-webview");
 
   export class PlayGuest extends Guest{
     private station:Station;
 
-    constructor(webview:Electron.WebViewElement, station:Station) {
-      super(webview);
+    constructor(webview:Electron.WebViewElement, station:Station, subscriber:Subscriber) {
+      super(webview, subscriber);
       this.station = station;
 
       safeIPC.on("buttonStylesFetched", (playBtnStyle:CSSStyleDeclaration, pauseBtnStyles:CSSStyleDeclaration) =>
@@ -29,7 +30,7 @@
           this.webview.executeJavaScript(Utils.click(this.station.buttons.play))
       }
     };
-    
+
     playPause():void {
       if (this.station && this.station.buttons.play !== this.station.buttons.pause) {
         let fetchButtons = 'electronSafeIpc.send("buttonStylesFetched", ' + Utils.getComputedStyle(this.station.buttons.play) + ',' + Utils.getComputedStyle(this.station.buttons.pause) + ')';

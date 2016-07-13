@@ -1,6 +1,6 @@
-import {PPWindowImpl} from "../domain/window";
+import {PPWindow} from "../domain/window";
 
-(<PPWindowImpl>window).PP_EP = (() => {
+(<PPWindow>window).PP_EP = (() => {
   const LOG = 'color: orange; font-weight: bold;';
   console.log('%c render on guest', LOG);
 
@@ -104,11 +104,11 @@ import {PPWindowImpl} from "../domain/window";
   return {
     getButtons: () => {
       console.log('%c render on guest.getButtons()', LOG);
-      (<PPWindowImpl>window).electronSafeIpc.send('buttonsFetched', [1,2,3]);
+      (<PPWindow>window).electronSafeIpc.send('buttonsFetched', [1,2,3]);
     },
     getButtonCandidates: () => {
       var buttonCandidates = _getButtonCandidates();
-      (<PPWindowImpl>window).electronSafeIpc.send('buttonCandidatesFetched', buttonCandidates);
+      (<PPWindow>window).electronSafeIpc.send('buttonCandidatesFetched', buttonCandidates);
 
     }
   }

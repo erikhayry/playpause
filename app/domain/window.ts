@@ -1,5 +1,5 @@
 import {Render} from "../../render";
-export interface PPWindowImpl extends Window {
+export interface PPWindow extends Window {
   render:Render
   PP_EP:any
   electronSafeIpc: {

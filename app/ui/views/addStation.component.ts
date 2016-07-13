@@ -1,10 +1,8 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
-import {PPWindowImpl} from "../../domain/window";
-import {Render} from "../../../render";
 import {Station, StationButtonPath, StationButtons} from "../../domain/station";
 import {ROUTER_DIRECTIVES} from "@angular/router";
 import WebViewElement = Electron.WebViewElement;
-import {Logger} from "../../domain/logger";
+import {RenderComponent} from "./render.component";
 
 @Component({
   template: `
@@ -31,7 +29,7 @@ import {Logger} from "../../domain/logger";
       </div>
       
       <webview 
-            #newStation
+            #guest
             style="display:inline-flex; width:100%; height:100%"
             autosize="on"
             plugins
@@ -43,41 +41,35 @@ import {Logger} from "../../domain/logger";
   directives: [ROUTER_DIRECTIVES],
 })
 
-export class AddStationComponent{
-  private logger = new Logger('AddStationComponent', 'red');
-  private render:Render;
-  newStation:WebViewElement;
+export class AddStationComponent extends RenderComponent{
   url = 'http://sverigesradio.se/';
   playButton:any;
   pauseButton:any;
   added = false;
 
   constructor() {
-    this.render = (<PPWindowImpl>window).render;
+    super('AddStationComponent')
   }
 
-  @ViewChild('newStation') input:ElementRef;
-  ngAfterViewInit() {
-    this.logger.log('ngAfterViewInit', this.input);
-    this.newStation = this.input.nativeElement;
+  afterInit():void {
+    //Do nothing
+  }
 
-    this.newStation.addEventListener('dom-ready', (e:Event) => {
-      this.logger.log('webView on dom-ready', e);
-
-      this.render.setAddStation(this.newStation).then((buttons:Array<any>) => {
-        this.logger.log('render on onButtonCandidatesFetched', buttons);
-        this.playButton = buttons.find(button => button.isPlayButton);
-        this.pauseButton = buttons.find(button => button.isPauseButton) || this.playButton;
-      });
-
-      this.newStation.openDevTools();
+  domReady():void{
+    this.logger.log('domReady');
+    var stationCandidate = this.render.buildStationCandidate(this.guest);
+    stationCandidate.getButtonsCandidates().then((buttons:Array<any>) => {
+      this.logger.log('render on onButtonCandidatesFetched', buttons);
+      this.playButton = buttons.find(button => button.isPlayButton);
+      this.pauseButton = buttons.find(button => button.isPauseButton) || this.playButton;
     });
 
+    this.guest.openDevTools();
   }
 
   loadUrl = (url:string) => {
     this.logger.log('loadUrl', url);
-    this.newStation.src = url;
+    this.guest.src = url;
   };
 
   addStation = (newUrl:string, newName:string, newPlay:string, newPause:string) => {

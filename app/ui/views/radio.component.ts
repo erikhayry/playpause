@@ -1,11 +1,10 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
-import {PPWindowImpl} from "../../domain/window";
-import {Render} from "../../../render";
-import {Station} from "../../domain/station";
 import {ROUTER_DIRECTIVES} from "@angular/router";
 import WebViewElement = Electron.WebViewElement;
 import WebViewElementEvent = Electron.WebViewElement.Event;
+import {Station} from "../../domain/station";
 import {Logger} from "../../domain/logger";
+import {RenderComponent} from "./render.component";
 
 @Component({
   template: `
@@ -28,7 +27,7 @@ import {Logger} from "../../domain/logger";
         <div class="col-sm-7 main">
           <h3 class="text-center">{{guestTitle}}</h3>
           <webview 
-            #quest
+            #guest
             style="display:inline-flex; width:100%; height:100%"
             autosize="on"
             plugins
@@ -42,39 +41,13 @@ import {Logger} from "../../domain/logger";
   directives: [ROUTER_DIRECTIVES]
 })
 
-export class RadioComponent{
-  private logger = new Logger('RadioComponent', 'red');
-  private guest:WebViewElement;
-  private render:Render;
+export class RadioComponent extends RenderComponent{
   stations:Array<Station>;
   currentStation:Station;
   guestTitle:string;
 
-  constructor() {
-    this.render = (<PPWindowImpl>window).render;
-  }
-
-  @ViewChild('quest') input:ElementRef;
-  ngAfterViewInit() {
-    this.logger.log('ngAfterViewInit', this.input);
-    this.guest = this.input.nativeElement;
-
-    this.render.getStations().then((stations:Station[]) => {
-      this.stations = stations;
-      this.currentStation = this.stations[0];
-      this.guest.src = this.currentStation.url;
-    });
-
-    this.render.on('playpause', (e:Event) => {
-      this.logger.log('onPlaypause', e);
-    });
-
-    this.guest.addEventListener('dom-ready', (e:WebViewElementEvent) => {
-      this.logger.log('onDom-ready', e);
-      this.guestTitle = this.guest.getTitle();
-      this.render.setStation(this.currentStation, this.guest);
-      this.guest.openDevTools();
-    });
+  constructor(){
+    super('RadioComponent')
   }
 
   openStation = (station:Station) => {
@@ -94,4 +67,27 @@ export class RadioComponent{
   openDevTools = () => {
     this.guest.openDevTools();
   };
+
+  domReady():void{
+    this.logger.log('domReady');
+    this.guestTitle = this.guest.getTitle();
+    var playGuest = this.render.buildStation(this.currentStation, this.guest);
+
+    playGuest.on('playpause', (e:Event) => {
+      this.logger.log('onPlaypause', e);
+      playGuest.playPause()
+    });
+
+    this.guest.openDevTools();
+  }
+
+  afterInit(){
+    this.logger.log('afterInit');
+    this.render.getStations().then((stations:Station[]) => {
+      this.stations = stations;
+      this.currentStation = this.stations[0];
+      this.guest.src = this.currentStation.url;
+    });
+  };
+
 }

@@ -14,19 +14,13 @@ import {DB} from './app/render/db';
 //TODO handle exports error on load
 export class Render{
   private logger = new Logger('Render', 'pink');
-  private playGuest:PlayGuest;
-  private addGuest:AddGuest;
   private subscriber:Subscriber;
 
   constructor() {
     const MAIN:IpcRenderer = require('electron').ipcRenderer;
     this.subscriber = new Subscriber();
 
-    MAIN.on('playpause', (event:IpcRendererEvent) => {
-      this.logger.log('playpause', event);
-      this.playGuest.playPause();
-      this.subscriber.publish('playpause', event);
-    });
+    MAIN.on('playpause', (event:IpcRendererEvent) => this.subscriber.publish('playpause', event));
   }
 
   getStations = DB.getAll;
@@ -34,18 +28,13 @@ export class Render{
   addStation = DB.add;
   removeStation = DB.remove;
 
-  setStation = (station:Station, webview:WebViewElement) => {
+  buildStation = (station:Station, webview:WebViewElement):PlayGuest => {
     this.logger.log('setStation', station);
-    this.playGuest = new PlayGuest(webview, station);
+    return new PlayGuest(webview, station, this.subscriber);
   };
 
-  setAddStation = (webview:WebViewElement):Promise<any[]> => {
+  buildStationCandidate = (webview:WebViewElement):AddGuest => {
     this.logger.log('setAddStation');
-    this.addGuest = new AddGuest(webview);
-    return this.addGuest.getButtonsCandidates();
+    return new AddGuest(webview, this.subscriber);
   };
-
-  on = (topic:string, listener:any) =>{
-    return this.subscriber.on(topic, listener);
-  }
 }
