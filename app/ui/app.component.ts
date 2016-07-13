@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Type} from '@angular/core';
 import {ROUTER_DIRECTIVES} from '@angular/router';
 import {RadioComponent} from "./views/radio.component";
 import {AddStationComponent} from "./views/addStation.component";
@@ -11,5 +11,4 @@ import {AddStationComponent} from "./views/addStation.component";
   directives: [ROUTER_DIRECTIVES],
   precompile: [RadioComponent, AddStationComponent]
 })
-export class AppComponent {
-}
+export class AppComponent extends Type {}

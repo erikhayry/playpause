@@ -1,14 +1,14 @@
 export class StationButtons{
-  play:ButtonPath;
-  pause:ButtonPath;
+  play:StationButtonPath;
+  pause:StationButtonPath;
 
-  constructor(play:ButtonPath, pause:ButtonPath) {
+  constructor(play:StationButtonPath, pause:StationButtonPath) {
     this.play = play;
     this.pause = pause;
   }
 }
 
-export class ButtonPath{
+export class StationButtonPath{
   value:string;
   type:string;
 

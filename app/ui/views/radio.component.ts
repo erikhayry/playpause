@@ -1,11 +1,11 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
 import {PPWindowImpl} from "../../domain/window";
 import {Render} from "../../../render";
-import {Station, ButtonPath, StationButtons} from "../domain/stations";
+import {Station} from "../../domain/station";
 import {ROUTER_DIRECTIVES} from "@angular/router";
 import WebViewElement = Electron.WebViewElement;
 import WebViewElementEvent = Electron.WebViewElement.Event;
-import {Logger} from "../../domain_/Logger";
+import {Logger} from "../../domain/logger";
 
 @Component({
   template: `

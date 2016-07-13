@@ -1,10 +1,10 @@
-import {ButtonPath} from "../ui/domain/stations";
-import {Logger} from "../domain_/Logger";
+import {StationButtonPath} from "../domain/station";
+import {Logger} from "../domain/logger";
 
 export module Utils{
   let logger = new Logger('Utils', 'orange');
 
-  let getElementQuery = (path:ButtonPath) => {
+  let getElementQuery = (path:StationButtonPath) => {
     if(path.type === 'selector'){
       return 'document.querySelectorAll("' + path.value +'")[0]'
     }
@@ -14,7 +14,7 @@ export module Utils{
     }
   };
 
-  export function click(buttonPath:ButtonPath):string{
+  export function click(buttonPath:StationButtonPath):string{
     logger.log('click', buttonPath);
     return getElementQuery(buttonPath) + '.click()'
   }
@@ -30,12 +30,12 @@ export module Utils{
     }
   }
 
-  export function getElement(path:ButtonPath){
+  export function getElement(path:StationButtonPath){
     logger.log('getElement', path);
     return getElementQuery(path)
   }
 
-  export function getComputedStyle(path:ButtonPath){
+  export function getComputedStyle(path:StationButtonPath){
     logger.log('getComputedStyle', path);
     return 'window.getComputedStyle(' + getElementQuery(path) + ')'
   }

@@ -1,13 +1,22 @@
-import {Station} from "../ui/domain/stations";
-import {Logger} from "../domain_/Logger";
+import {Station} from "../domain/station";
+import {Logger} from "../domain/logger";
+
 import {PouchUpdateResponse} from "~pouchdb/index";
 import {PouchError} from "~pouchdb/index";
 import {PouchGetResponse} from "~pouchdb/index";
 import {PouchAllDocsResponse} from "~pouchdb/index";
+import PouchDB from "~pouchdb/index";
 
 //TODO handle edit
 //TODO handle add already exisiting
 //TODO handle errors
+
+interface diffFunc { (doc:any):any }
+
+interface PuouchDbUpsert extends PouchDB{
+  upsert(docId:string, diffFunc:diffFunc):Promise<PouchUpdateResponse>
+  putIfNotExists(docId:string|number, doc:any):Promise<PouchUpdateResponse>
+}
 
 export module DB{
   let logger = new Logger('DB', 'pink');
@@ -15,7 +24,7 @@ export module DB{
   const app = remote.app;
   const PouchDB = require('pouchdb');
   PouchDB.plugin(require('pouchdb-upsert'));
-  const db = new PouchDB(app.getPath('userData') + '/pp_db');
+  const db = (<PuouchDbUpsert>new PouchDB(app.getPath('userData') + '/pp_db'));
 
   //db.destroy()
   add({
@@ -79,7 +88,6 @@ export module DB{
 
   export function remove(stationUrl:string) {
     logger.log('remove', stationUrl);
-
     return new Promise<any>((resolve, reject) => {
       db.get(stationUrl).then((doc:PouchGetResponse) => {
         db.remove(doc._id, doc._rev);
@@ -90,22 +98,21 @@ export module DB{
 
   export function get(stationUrl:string) {
     logger.log('get', stationUrl);
-
     return new Promise<any>((resolve, reject) => {
-      db.get(stationUrl).then((doc:PouchAllDocsResponse) => {
-        resolve(doc.rows.map(row => row.doc.station))
+      //TODO typings wrong, any for now
+      db.get(stationUrl).then((doc:any) => {
+        resolve(doc.rows.map((row: any) => row.doc.station))
       });
     })
   }
 
   export function getAll() {
     logger.log('getAll');
-
     return new Promise<any>((resolve, reject) => {
-      db.allDocs({include_docs: true, descending: true}, (err:string, doc:PouchAllDocsResponse) => {
+      db.allDocs({include_docs: true, descending: true}).then((doc:PouchAllDocsResponse) => {
         logger.log('get success', doc);
         resolve(doc.rows.map(row => row.doc.station));
-      });
+      })
     })
   }
 }

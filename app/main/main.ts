@@ -4,9 +4,7 @@ import {Keybindings} from "./keybindings";
 import {Settings} from "./settings";
 const app = require('app');
 const BrowserWindow = require('browser-window');
-
 const settings = require('./settings');
-
 
 //Init
 Plugins.init(app);

@@ -1,4 +1,4 @@
-import {Logger} from "../domain_/Logger";
+import {Logger} from "../domain/logger";
 
 export class Subscriber {
   private logger = new Logger('Subscriber', 'brown');

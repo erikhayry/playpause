@@ -1,11 +1,11 @@
 let assert = require('chai').assert;
 
-import {ButtonPath} from "../../app/ui/domain/stations";
+import {StationButtonPath} from "../../app/domain/station";
 import {Utils} from '../../app/render/utils';
 
 describe('Utils', () => {
-  let buttonPathElement = new ButtonPath('.button', 'selector');
-  let buttonPathiFrame = new ButtonPath('player,.button', 'iframe');
+  let buttonPathElement = new StationButtonPath('.button', 'selector');
+  let buttonPathiFrame = new StationButtonPath('player,.button', 'iframe');
 
   describe('click', () => {
     it('should return click action for element', () => {

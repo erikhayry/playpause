@@ -1,22 +1,22 @@
 'use strict';
-import {Station} from './app/ui/domain/stations';
 import IpcRenderer = Electron.IpcRenderer;
 import IpcRendererEvent = Electron.IpcRendererEvent;
 import WebViewElement = Electron.WebViewElement;
 
-import {Logger} from './app/domain_/Logger';
+import {Station} from './app/domain/station';
+import {Logger} from './app/domain/logger';
 import {Subscriber} from './app/render/subscriber';
-import {Guest} from './app/render/guest';
+import {PlayGuest} from './app/render/playGuest';
 import {AddGuest} from './app/render/addGuest';
 import {DB} from './app/render/db';
 
 
 //TODO handle exports error on load
-export class Render {
-  guest:Guest;
-  addGuest:AddGuest;
-  subscriber:Subscriber;
-  logger = new Logger('Render', 'pink');
+export class Render{
+  private logger = new Logger('Render', 'pink');
+  private playGuest:PlayGuest;
+  private addGuest:AddGuest;
+  private subscriber:Subscriber;
 
   constructor() {
     const MAIN:IpcRenderer = require('electron').ipcRenderer;
@@ -24,7 +24,7 @@ export class Render {
 
     MAIN.on('playpause', (event:IpcRendererEvent) => {
       this.logger.log('playpause', event);
-      this.guest.onPlayPause();
+      this.playGuest.playPause();
       this.subscriber.publish('playpause', event);
     });
   }
@@ -36,13 +36,13 @@ export class Render {
 
   setStation = (station:Station, webview:WebViewElement) => {
     this.logger.log('setStation', station);
-    this.guest = new Guest(webview, station);
+    this.playGuest = new PlayGuest(webview, station);
   };
 
   setAddStation = (webview:WebViewElement):Promise<any[]> => {
     this.logger.log('setAddStation');
     this.addGuest = new AddGuest(webview);
-    return this.addGuest.getButtonsCanidates();
+    return this.addGuest.getButtonsCandidates();
   };
 
   on = (topic:string, listener:any) =>{

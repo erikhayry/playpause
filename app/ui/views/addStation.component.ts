@@ -1,10 +1,10 @@
 import {ViewChild, Component, ElementRef} from '@angular/core';
 import {PPWindowImpl} from "../../domain/window";
 import {Render} from "../../../render";
-import {Station, ButtonPath, StationButtons} from "../domain/stations";
+import {Station, StationButtonPath, StationButtons} from "../../domain/station";
 import {ROUTER_DIRECTIVES} from "@angular/router";
 import WebViewElement = Electron.WebViewElement;
-import {Logger} from "../../domain_/Logger";
+import {Logger} from "../../domain/logger";
 
 @Component({
   template: `
@@ -83,8 +83,8 @@ export class AddStationComponent{
   addStation = (newUrl:string, newName:string, newPlay:string, newPause:string) => {
     this.logger.log('addStation', newUrl, newName, newPlay, newPause);
 
-    let _play = new ButtonPath(newPlay, 'selector');
-    let _pause = new ButtonPath(newPause, 'selector');
+    let _play = new StationButtonPath(newPlay, 'selector');
+    let _pause = new StationButtonPath(newPause, 'selector');
     let _buttons = new StationButtons(_play, _pause);
 
     this.render.addStation(new Station(newName, newUrl, _buttons)).then((stations:Station[]) => {
