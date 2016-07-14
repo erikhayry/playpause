@@ -58,7 +58,7 @@ export class AddStationComponent extends RenderComponent{
   domReady():void{
     this.logger.log('domReady');
     var stationCandidate = this.render.buildStationCandidate(this.guest);
-    stationCandidate.getButtonsCandidates().then((buttons:Array<any>) => {
+    stationCandidate.getButtonCandidates().then((buttons:Array<any>) => {
       this.logger.log('render on onButtonCandidatesFetched', buttons);
       this.playButton = buttons.find(button => button.isPlayButton);
       this.pauseButton = buttons.find(button => button.isPauseButton) || this.playButton;

@@ -10,7 +10,7 @@ const root = path.dirname(require.main.filename);
 export abstract class Guest{
   logger = new Logger('Guest', 'green');
   webview:WebViewElement;
-  subscriber:Subscriber
+  subscriber:Subscriber;
 
   constructor(webview:Electron.WebViewElement, subscriber:Subscriber) {
     this.webview = webview;
@@ -22,5 +22,5 @@ export abstract class Guest{
 
   on = (topic:string, listener:any) =>{
     return this.subscriber.on(topic, listener);
-  }
+  };
 }
