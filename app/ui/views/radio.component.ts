@@ -73,6 +73,7 @@ export class RadioComponent extends RenderComponent{
     this.guestTitle = this.guest.getTitle();
     var playGuest = this.render.buildStation(this.currentStation, this.guest);
 
+    //TODO remove listeners when closed
     playGuest.on('playpause', (e:Event) => {
       this.logger.log('onPlaypause', e);
       playGuest.playPause()
