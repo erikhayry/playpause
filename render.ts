@@ -10,13 +10,13 @@ import {PlayGuest} from './app/render/playGuest';
 import {AddGuest} from './app/render/addGuest';
 import {DB} from './app/render/db';
 
-
 //TODO handle exports error on load
 export class Render{
   private logger = new Logger('Render', 'pink');
   private subscriber:Subscriber;
 
   constructor() {
+    this.logger.log('constructor');
     const MAIN:IpcRenderer = require('electron').ipcRenderer;
     this.subscriber = new Subscriber();
 
@@ -27,6 +27,10 @@ export class Render{
   getStation = DB.get;
   addStation = DB.add;
   removeStation = DB.remove;
+
+  unsubscribe = (e:any) => {
+    this.subscriber.unsubscribe(e)
+  }
 
   buildStation = (station:Station, webview:WebViewElement):PlayGuest => {
     this.logger.log('setStation', station);

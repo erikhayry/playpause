@@ -10,6 +10,7 @@
 
     constructor(webview:Electron.WebViewElement, station:Station, subscriber:Subscriber) {
       super(webview, subscriber);
+      this.logger.log('constructor');
       this.station = station;
     }
 

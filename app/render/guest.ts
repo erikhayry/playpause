@@ -13,6 +13,7 @@ export abstract class Guest{
   subscriber:Subscriber;
 
   constructor(webview:Electron.WebViewElement, subscriber:Subscriber) {
+    this.logger.log('constructor');
     this.webview = webview;
     this.subscriber = subscriber;
 

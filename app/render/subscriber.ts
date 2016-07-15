@@ -1,30 +1,38 @@
 import {Logger} from "../domain/logger";
 
+export interface SubscriberToken{
+  topic:string,
+  index:number
+}
+
 export class Subscriber {
   private logger = new Logger('Subscriber', 'brown');
   private topics = {};
   private hasOwnProperty = this.topics.hasOwnProperty;
 
-  constructor() {
-
-  }
-
   on(topic:string, listener:any){
-    this.logger.log('on', topic, typeof listener);
+    this.logger.log('on', topic, typeof listener, this.topics);
 
-    if(!this.hasOwnProperty.call(this.topics, topic)) this.topics[topic] = [];
-    let index = this.topics[topic].push(listener) -1;
+    if(!this.hasOwnProperty.call(this.topics, topic)) {
+      this.topics[topic] = [];
+    }
 
     return {
-        remove: function(topic:string) {
-        this.logger.log('on.delete', topic);
-        delete this.topics[topic][index];
-      }
-    };
+      topic: topic,
+      index: this.topics[topic].push(listener) - 1
+    }
   };
 
+  unsubscribe(token:SubscriberToken){
+    this.logger.log('unsubscribe', token, this.topics);
+
+    if(this.topics[token.topic] && this.topics[token.topic][token.index]){
+      delete this.topics[token.topic][token.index];
+    }
+  }
+
   publish(topic:string, info:any){
-    this.logger.log('on', topic, info);
+    this.logger.log('publish', topic, info, this.topics);
 
     if(!this.hasOwnProperty.call(this.topics, topic)) return;
 

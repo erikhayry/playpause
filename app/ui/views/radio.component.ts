@@ -51,12 +51,14 @@ export class RadioComponent extends RenderComponent{
   }
 
   openStation = (station:Station) => {
+    this.unsubscribe();
     this.logger.log('openStation', station);
     this.guest.src = station.url;
     this.currentStation = station;
   };
 
   removeStation = (url:string) => {
+    this.unsubscribe();
     this.logger.log('removeStation', url);
     this.render.removeStation(url).then((stations:Station[]) => {
       this.logger.log('removeStation > removed', stations);
@@ -73,12 +75,7 @@ export class RadioComponent extends RenderComponent{
     this.guestTitle = this.guest.getTitle();
     var playGuest = this.render.buildStation(this.currentStation, this.guest);
 
-    //TODO remove listeners when closed
-    playGuest.on('playpause', (e:Event) => {
-      this.logger.log('onPlaypause', e);
-      playGuest.playPause()
-    });
-
+    this.events.push(playGuest.on('playpause', (e:Event) => playGuest.playPause()));
     this.guest.openDevTools();
   }
 
@@ -90,5 +87,4 @@ export class RadioComponent extends RenderComponent{
       this.guest.src = this.currentStation.url;
     });
   };
-
 }
