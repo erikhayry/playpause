@@ -15,17 +15,33 @@ describe('Subscriber', () => {
     _testRet2 = val
   });
 
-  _subscriber.on('test3', (val:any) => {
+  let token3 = _subscriber.on('test3', (val:any) => {
     _testRet3 = val
   });
 
-  _subscriber.publish('test', 'testVal');
-  _subscriber.publish('test3', 'testVal3');
-
   it('should publish event',  ()  => {
+    _subscriber.publish('test', 'testVal');
+    _subscriber.publish('test3', 'testVal3');
+
     assert.equal(_testRet, 'testVal');
     assert.equal(_testRet2, 'testVal');
     assert.equal(_testRet3, 'testVal3');
   });
-  
+
+  it('should unsubscribe event',  ()  => {
+    _testRet = '';
+    _testRet2 = '';
+    _testRet3 = '';
+    _subscriber.unsubscribe(token3);
+    _subscriber.unsubscribe({topic: 'test3', index: 99});
+    _subscriber.unsubscribe({topic: 'missingTopic', index: 99});
+
+    _subscriber.publish('test', 'testVal');
+    _subscriber.publish('test3', 'testVal3');
+
+    assert.equal(_testRet, 'testVal');
+    assert.equal(_testRet2, 'testVal');
+    assert.equal(_testRet3, '');
+  });
+
 });

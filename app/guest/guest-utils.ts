@@ -1,4 +1,5 @@
 import {PPWindow} from "../domain/window";
+import {StationButtonPath} from "../domain/station";
 
 (<PPWindow>window).PP_EP = (() => {
   const LOG = 'color: orange; font-weight: bold;';
@@ -99,17 +100,36 @@ import {PPWindow} from "../domain/window";
       .sort((a,b) => (b.playButtonScore + b.pauseButtonScore) - (a.playButtonScore + a.pauseButtonScore));
   }
 
-
+  function _getElementQuery(path:StationButtonPath):HTMLElement{
+    if(path.type === 'selector'){
+      return document.querySelectorAll(path.value)[0]
+    }
+    if(path.type === 'iframe'){
+      let _paths = path.value.split(',');
+      return window.frames[_paths[0]].contentDocument.querySelectorAll(_paths[1])[0]
+    }
+  }
 
   return {
     getButtons: () => {
       console.log('%c render on guest.getButtons()', LOG);
       (<PPWindow>window).electronSafeIpc.send('buttonsFetched', [1,2,3]);
     },
+
     getButtonCandidates: () => {
       var buttonCandidates = _getButtonCandidates();
       (<PPWindow>window).electronSafeIpc.send('buttonCandidatesFetched', buttonCandidates);
+    },
 
+    getPlayerState: (playBtnObj:StationButtonPath, pauseBtnObj:StationButtonPath) => {
+      (<PPWindow>window).electronSafeIpc.send("buttonStylesFetched", {
+        playBtnStyle:window.getComputedStyle(_getElementQuery(playBtnObj)),
+        pauseBtnStyle: window.getComputedStyle(_getElementQuery(pauseBtnObj))
+      })
+    },
+
+    click: (buttonPath:StationButtonPath):void => {
+      _getElementQuery(buttonPath).click()
     }
   }
 })();
