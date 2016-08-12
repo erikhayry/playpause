@@ -8,6 +8,7 @@ import {Logger} from './app/domain/logger';
 import {Subscriber} from './app/render/subscriber';
 import {PlayGuest} from './app/render/playGuest';
 import {AddGuest} from './app/render/addGuest';
+import {TesterGuest} from "./app/render/testerGuest";
 import {DB} from './app/render/db';
 
 //TODO handle exports error on load
@@ -40,5 +41,10 @@ export class Render{
   buildStationCandidate = (webview:WebViewElement):AddGuest => {
     this.logger.log('setAddStation');
     return new AddGuest(webview, this.subscriber);
+  };
+
+  buildTesterStation = (webview:WebViewElement):TesterGuest => {
+    this.logger.log('setTesterStation');
+    return new TesterGuest(webview, this.subscriber);
   };
 }
