@@ -3,7 +3,6 @@ import {ROUTER_DIRECTIVES} from "@angular/router";
 import WebViewElement = Electron.WebViewElement;
 import WebViewElementEvent = Electron.WebViewElement.Event;
 import {Station} from "../../domain/station";
-import {Logger} from "../../domain/logger";
 import {RenderComponent} from "./render.component";
 
 @Component({

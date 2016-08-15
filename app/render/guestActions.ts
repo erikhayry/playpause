@@ -33,6 +33,21 @@ export module GuestActions{
     })
   }
 
+  export function getTestableButtonCandidates(id:string, webview:WebViewElement):Promise<any[]>{
+    console.log(id)
+    webview.executeJavaScript(`PP_EP.getTestableButtonCandidates(${JSON.stringify(id)})`);
+
+    return new Promise<any>((resolve, reject) => {
+      safeIPC.on('testableButtonCandidatesFetched'+webview.id, (buttons:any[]) => {
+        safeIPC.removeAllListeners('testableButtonCandidatesFetched'+webview.id);
+        resolve({
+          buttons: buttons, 
+          id: webview.id
+        })
+      }); //TODO handle reject
+    })
+  }
+
   export function getGuestState(webview:WebViewElement, station:Station):Promise<string>{
     webview.executeJavaScript(`PP_EP.getPlayerState(${JSON.stringify(station.buttons.play)}, ${JSON.stringify(station.buttons.pause)})`);
 

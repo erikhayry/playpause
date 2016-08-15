@@ -3,6 +3,6 @@
 export module Settings {
   export const browserWindow = {
     height: 1100,
-    width: 1600
+    width: 1900
   }
 }
