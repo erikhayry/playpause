@@ -1,7 +1,8 @@
 import {PPWindow} from "../domain/window";
 import {StationButtonPath} from "../domain/station";
+import {iRatedHTMLElement} from "../domain/iRatedHTMLElement";
 
-class ratedHTMLElement{
+class ratedHTMLElement implements iRatedHTMLElement{
   element:HTMLElement;
   path:string;
   className:string;
@@ -13,17 +14,23 @@ class ratedHTMLElement{
   isPauseButton = false;
   parentXpath:string;
   xpath:string;
+  nodeName:string;
 
   constructor(element:HTMLElement, parentXpath:string) {
     this.element = element;
     this.parentXpath = parentXpath;
-    this.className = element.className;
+    this.className = (element.className.replace) ? element.className.replace(/\s\s+/g, ' ') : element.className;
     this.title = element.title;
     this.id = element.id;
+    this.nodeName = element.nodeName;
 
     if(!this.isOtherMediaControl(this.element)){
-      this.checkAttributes(this.element, 1000);
-      this.checkNodeName(this.element, 100);
+      this.setButtonType(this.element);
+
+      if(this.isPlayButton || this.isPauseButton){
+        this.checkNodeName(this.element, 100);
+        this.checkAttributes(this.element, 100);
+      }
     }
   }
 
@@ -33,43 +40,48 @@ class ratedHTMLElement{
 
   private isOtherMediaControl(element:HTMLElement):boolean{
     const IGNORED_VALUES = [
-      'playlist', 'player', 'volume', 'open', 'radioplayer'
+      'playlist', 'volume', 'open', 'radioplayer'
     ];
 
     return this._PP_MEDIA_ATTRIBUTES.some(attr => {
-
       if(element[attr] && element[attr].indexOf){
         const EL_ATTR = element[attr].toLowerCase();
         return IGNORED_VALUES.some(val => {
           return (EL_ATTR.indexOf(val) > -1)
         })
       }
+    });
+  }
 
+  private setButtonType(element:HTMLElement):void{
+    this.isPlayButton = this._PP_MEDIA_ATTRIBUTES.some(attr => {
+      if(element[attr] && element[attr].indexOf){
+        const EL_ATTR = element[attr].toLowerCase();
+        return EL_ATTR.indexOf('play') > -1
+       }
+    });
+
+    this.isPauseButton = this._PP_MEDIA_ATTRIBUTES.some(attr => {
+      if(element[attr] && element[attr].indexOf){
+        const EL_ATTR = element[attr].toLowerCase();
+        return (EL_ATTR.indexOf('stop') > -1 || EL_ATTR.indexOf('pause') > -1)
+      }
     });
   }
 
   private checkAttributes(element:HTMLElement, score:number):void{
     this._PP_MEDIA_ATTRIBUTES.forEach(attr => {
-      if(element[attr] && element[attr].indexOf){
+      if(element[attr]){
         const EL_ATTR = element[attr].toLowerCase();
-
-        if (EL_ATTR.indexOf('play') > -1) {
-          this.playButtonScore += score;
-          this.isPlayButton = true; //TODO don set this here
-        }
-
-        if (EL_ATTR.indexOf('stop') > -1 || EL_ATTR.indexOf('pause') > -1) {
-          this.pauseButtonScore += score;
-          this.isPauseButton = true;
-        }
+        this.playButtonScore += (EL_ATTR.match(/play/g) || []).length * score;
+        this.pauseButtonScore += (EL_ATTR.match(/pause/g) || []).length * score;
       }
     });
   }
 
   private checkNodeName(element:HTMLElement, score:number){
-    if (element.nodeName === 'BUTTON') {
+    if (element.nodeName === 'BUTTON' || (element.nodeName && element.nodeName.indexOf('button') > -1)) {
       if(this.isPlayButton){
-        console.log(element.nodeName)
         this.playButtonScore += score
       }
       if(this.isPauseButton){
@@ -194,7 +206,8 @@ class ratedHTMLElement{
   }
 
   function _getButtonCandidates(elements?:any, old?:Array<any>, parentXpath?:string){
-    let _elements = elements || document.querySelectorAll('*')
+    const IGNORED_NODE_TYPES = ['A'];
+    let _elements = elements || document.querySelectorAll('*');
     let _old = old || [];
     let _parentXpath = parentXpath || null;
 
@@ -210,7 +223,7 @@ class ratedHTMLElement{
         }
       }
 
-      else{
+      else if(IGNORED_NODE_TYPES.indexOf(el.nodeName) < 0){
         _old.push(new ratedHTMLElement(el, _parentXpath));
       }
 
@@ -257,6 +270,7 @@ class ratedHTMLElement{
       }
       pauseButtonsCandidates.forEach(el => delete el['element']);
 
+      //TODO check if one winner or multiple
 
       (<PPWindow>window).electronSafeIpc.send('testableButtonCandidatesFetched'+id, {
         playButtonsCandidates: playButtonsCandidates,

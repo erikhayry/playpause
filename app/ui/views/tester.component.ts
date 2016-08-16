@@ -77,26 +77,12 @@ export class TesterComponent {
       }
     },
     {
-      id: 'google',
-      url: 'https://play.google.com/music/listen?authuser#/now',
-      buttons: {
-        play: {
-          xpath: '//*[@id="player-bar-play-pause"]',
-          id: 'player-bar-play-pause'
-        },
-        pause: {
-          xpath: '//*[@id="player-bar-play-pause"]',
-          id: 'player-bar-play-pause'
-        }
-      }
-    },
-    {
       id: 'lastfm',
       url: 'http://www.last.fm/home',
       buttons: {
         play: {
           xpath: '/html/body/div[2]/div/section/div[1]/ul/li[2]/button',
-          className: 'js-play-pause player-bar-btn player-bar-btn--play'
+          className: ' js-play-pause player-bar-btn player-bar-btn--play '
         },
         pause: {
           xpath: '/html/body/div[2]/div/section/div[1]/ul/li[2]/button',
@@ -115,6 +101,21 @@ export class TesterComponent {
         pause: {
           xpath: '//*[@id="player-container"]/div/div[1]/div/div[1]/button',
           className: 'player-play th-p3-bg-color player-play--is-playing player-play--small'
+        }
+      }
+    },
+    {
+      id: 'google',
+      url: 'https://play.google.com/music/listen?authuser#/now',
+      buttons: {
+        play: {
+          xpath: '//*[@id="player-bar-play-pause"]',
+          id: 'player-bar-play-pause',
+          className: 'x-scope paper-icon-button-0'
+        },
+        pause: {
+          xpath: '//*[@id="player-bar-play-pause"]',
+          id: 'player-bar-play-pause'
         }
       }
     },

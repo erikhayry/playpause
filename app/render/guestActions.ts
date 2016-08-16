@@ -41,7 +41,7 @@ export module GuestActions{
       safeIPC.on('testableButtonCandidatesFetched'+webview.id, (buttons:any[]) => {
         safeIPC.removeAllListeners('testableButtonCandidatesFetched'+webview.id);
         resolve({
-          buttons: buttons, 
+          buttons: buttons,
           id: webview.id
         })
       }); //TODO handle reject
