@@ -43,10 +43,20 @@ import {PPWindow} from "../../domain/window";
               <td>{{station.buttons.play.id}}</td>
               <td>{{result[station.id].playButtonsCandidates[0].id}}</td>
               </tr>
-              <tr *ngIf="result[station.id].playButtonsCandidates[0].xpath" [ngClass]="result[station.id].playButtonsCandidates[0].xpath == station.buttons.play.xpath ? 'text-success' : 'text-danger'">
+              <tr *ngIf="station.buttons.play.xpath" 
+                [ngClass]="result[station.id].playButtonsCandidates[0].xpath == 
+                (station.buttons.play.parentXpath ? station.buttons.play.parentXpath + '+' : '') + station.buttons.play.xpath ? 'text-success' : 'text-danger'">
               <td>xpath</td>
               <td>{{station.buttons.play.xpath}}</td>
-              <td>{{result[station.id].playButtonsCandidates[0].xpath}}</td>
+              
+              <td *ngIf="result[station.id].playButtonsCandidates[0].parentXpath"
+              [ngClass]="station.buttons.play.xpath == result[station.id].playButtonsCandidates[0].parentXpath + '+' + result[station.id].playButtonsCandidates[0].xpath ? 'text-success' : 'text-danger'">
+                {{result[station.id].playButtonsCandidates[0].parentXpath}}+{{result[station.id].playButtonsCandidates[0].xpath}}
+              </td>
+              <td *ngIf="!result[station.id].playButtonsCandidates[0].parentXpath"
+              [ngClass]="result[station.id].playButtonsCandidates[0].xpath == station.buttons.play.xpath ? 'text-success' : 'text-danger'">
+                {{result[station.id].playButtonsCandidates[0].xpath}}
+              </td>
               </tr>
               </table>
             </div>
@@ -81,11 +91,11 @@ export class TesterComponent {
       url: 'http://www.last.fm/home',
       buttons: {
         play: {
-          xpath: '/html/body/div[2]/div/section/div[1]/ul/li[2]/button',
+          xpath: '/html/body/div[3]/section/div[1]/div[2]/ul/li[2]/button',
           className: ' js-play-pause player-bar-btn player-bar-btn--play '
         },
         pause: {
-          xpath: '/html/body/div[2]/div/section/div[1]/ul/li[2]/button',
+          xpath: '/html/body/div[3]/section/div[1]/div[2]/ul/li[2]/button',
           className: 'js-play-pause player-bar-btn player-bar-btn--pause'
         }
       }
@@ -140,7 +150,8 @@ export class TesterComponent {
       iframe: true,
       buttons: {
         play: {
-          xpath: '//*[@id="app-player"]//*[@id="play-pause"]', //TODO iframe path  + button path
+          className: 'btn btn-play btn-icon',
+          xpath: '//*[@id="app-player"]+//*[@id="play-pause"]',
           id: 'play-pause'
         },
         pause: {
@@ -150,14 +161,20 @@ export class TesterComponent {
       }
     },
     {
-      id: 'ot',
-      url: 'http://ot.fi',
+      id: 'tunein',
+      url: 'http://tunein.com/radio/Bandit-Rock-1065-s15426',
       buttons: {
-        play: {},
-        pause: {}
+        play: {
+          className: 'play-button',
+          xpath: '//*[@id="app-player"]+//*[@id="play-pause"]',
+        },
+        pause: {
+          xpath: '//*[@id="app-player"]//*[@id="play-pause"]',
+        }
       }
-    },
+    }
 
+      //http://tunein.com/radio/Bandit-Rock-1065-s15426/
       //'http://www.radio.org.se/',
       //'http://www.playradio.se/',
       //'http://www.internet-radio.com/station/dougeasyhits/',

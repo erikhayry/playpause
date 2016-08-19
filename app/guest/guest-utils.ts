@@ -2,7 +2,7 @@ import {PPWindow} from "../domain/window";
 import {StationButtonPath} from "../domain/station";
 import {iRatedHTMLElement} from "../domain/iRatedHTMLElement";
 
-class ratedHTMLElement implements iRatedHTMLElement{
+class RatedHTMLElement implements iRatedHTMLElement{
   element:HTMLElement;
   path:string;
   className:string;
@@ -15,6 +15,7 @@ class ratedHTMLElement implements iRatedHTMLElement{
   parentXpath:string;
   xpath:string;
   nodeName:string;
+  numberOfSiblings:number;
 
   constructor(element:HTMLElement, parentXpath:string) {
     this.element = element;
@@ -96,6 +97,7 @@ class ratedHTMLElement implements iRatedHTMLElement{
   console.log('%c render on guest', LOG);
 
    function _getElementXPath(element:HTMLElement){
+    console.log('_getElementXPath');
     if (element && element.id)
       return '//*[@id="' + element.id + '"]';
     else
@@ -103,6 +105,7 @@ class ratedHTMLElement implements iRatedHTMLElement{
   };
 
   function _getElementTreeXPath(element:HTMLElement){
+    console.log('_getElementTreeXPath', element);
     let paths:string[] = [];
 
     // Use nodeName (instead of localName) so namespace prefix is included (if any).
@@ -131,6 +134,8 @@ class ratedHTMLElement implements iRatedHTMLElement{
       let pathIndex = (index || hasFollowingSiblings ? "[" + (index + 1) + "]" : "");
       paths.splice(0, 0, tagName + pathIndex);
     }
+
+    console.log('paths', paths)
 
     return paths.length ? "/" + paths.join("/") : null;
   };
@@ -205,7 +210,7 @@ class ratedHTMLElement implements iRatedHTMLElement{
     return _el
   }
 
-  function _getButtonCandidates(elements?:any, old?:Array<any>, parentXpath?:string){
+  function _getButtonCandidates(elements?:any, old?:Array<any>, parentXpath?:string): RatedHTMLElement[]{
     const IGNORED_NODE_TYPES = ['A'];
     let _elements = elements || document.querySelectorAll('*');
     let _old = old || [];
@@ -224,7 +229,7 @@ class ratedHTMLElement implements iRatedHTMLElement{
       }
 
       else if(IGNORED_NODE_TYPES.indexOf(el.nodeName) < 0){
-        _old.push(new ratedHTMLElement(el, _parentXpath));
+        _old.push(new RatedHTMLElement(el, _parentXpath));
       }
 
     });
@@ -243,6 +248,23 @@ class ratedHTMLElement implements iRatedHTMLElement{
     }
   }
 
+  function _sortByUniqueness(buttonCandidates: RatedHTMLElement[]):RatedHTMLElement[]{
+    buttonCandidates.forEach(candidate => {
+      let identicalCandidates = buttonCandidates.filter(siblings => {
+        return siblings.className == candidate.className
+      });
+
+      candidate.numberOfSiblings = identicalCandidates.length;
+    });
+
+    return buttonCandidates.sort((a, b) => {
+      if((b.playButtonScore + b.pauseButtonScore) == (a.playButtonScore + a.pauseButtonScore)){
+        return a.numberOfSiblings - b.numberOfSiblings
+      }
+      return (b.playButtonScore + b.pauseButtonScore) - (a.playButtonScore + a.pauseButtonScore)
+    });
+  }
+
   return {
     getButtons: () => {
       console.log('%c render on guest.getButtons()', LOG);
@@ -258,19 +280,18 @@ class ratedHTMLElement implements iRatedHTMLElement{
       console.log(id);
       let buttonCandidates = _getButtonCandidates();
 
-      let playButtonsCandidates = buttonCandidates.filter((button) => button.isPlayButton);
+      let playButtonsCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isPlayButton));
       if(playButtonsCandidates.length > 0){
         playButtonsCandidates[0].xpath = _getElementXPath(playButtonsCandidates[0].element)
       }
-      playButtonsCandidates.forEach(el => delete el['element']);
 
-      let pauseButtonsCandidates = buttonCandidates.filter((button) => button.isPauseButton);
+      let pauseButtonsCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isPauseButton));
       if(pauseButtonsCandidates.length > 0){
         pauseButtonsCandidates[0].xpath = _getElementXPath(pauseButtonsCandidates[0].element)
       }
-      pauseButtonsCandidates.forEach(el => delete el['element']);
 
-      //TODO check if one winner or multiple
+      playButtonsCandidates.forEach(el => delete el['element']);
+      pauseButtonsCandidates.forEach(el => delete el['element']);
 
       (<PPWindow>window).electronSafeIpc.send('testableButtonCandidatesFetched'+id, {
         playButtonsCandidates: playButtonsCandidates,
