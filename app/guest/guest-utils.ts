@@ -15,7 +15,7 @@ class RatedHTMLElement implements iRatedHTMLElement{
   parentXpath:string;
   xpath:string;
   nodeName:string;
-  numberOfSiblings:number;
+  numberOfTwins:number;
 
   constructor(element:HTMLElement, parentXpath:string) {
     this.element = element;
@@ -29,6 +29,7 @@ class RatedHTMLElement implements iRatedHTMLElement{
       this.setButtonType(this.element);
 
       if(this.isPlayButton || this.isPauseButton){
+        this.checkSiblings(this.element, 1000);
         this.checkNodeName(this.element, 100);
         this.checkAttributes(this.element, 100);
       }
@@ -56,9 +57,14 @@ class RatedHTMLElement implements iRatedHTMLElement{
 
   private setButtonType(element:HTMLElement):void{
     this.isPlayButton = this._PP_MEDIA_ATTRIBUTES.some(attr => {
-      if(element[attr] && element[attr].indexOf){
+      if(element.parentNode.nodeName == 'BUTTON' || element.getElementsByTagName('button').length != 0){
+        return false
+      }
+
+      if(element[attr] && element[attr].match){
         const EL_ATTR = element[attr].toLowerCase();
-        return EL_ATTR.indexOf('play') > -1
+        let playMatches = (EL_ATTR.match(/play/g) || []).length;
+        return playMatches > 0 && playMatches != (EL_ATTR.match(/player/g) || []).length
        }
     });
 
@@ -66,6 +72,31 @@ class RatedHTMLElement implements iRatedHTMLElement{
       if(element[attr] && element[attr].indexOf){
         const EL_ATTR = element[attr].toLowerCase();
         return (EL_ATTR.indexOf('stop') > -1 || EL_ATTR.indexOf('pause') > -1)
+      }
+    });
+  }
+
+  private checkSiblings(element:HTMLElement, score:number):void{
+    const OTHER_MEDIA_VALUES = [
+      'volume', 'next', 'previous', 'stop', 'pause', 'artwork', 'srcubber', 'info', 'skip', 'repeat',
+      'rewind', 'forward', 'shuffle', 'queue', 'timeline', 'progress', 'cover', 'cover-art', 'track',
+    ];
+
+    let siblings = element.parentNode.childNodes;
+
+    [].forEach.call(siblings, (sibling:HTMLElement) => {
+      if(sibling != element && sibling.nodeName == element.nodeName){
+        this._PP_MEDIA_ATTRIBUTES.forEach(attr => {
+          if(sibling[attr]){
+            const EL_ATTR = sibling[attr].toLowerCase();
+
+            OTHER_MEDIA_VALUES.forEach(val => {
+              let matchingScore = (EL_ATTR.match(new RegExp(val, 'g')) || []).length * score;
+              this.playButtonScore += matchingScore;
+              this.pauseButtonScore += matchingScore;
+            })
+          }
+        });
       }
     });
   }
@@ -134,90 +165,18 @@ class RatedHTMLElement implements iRatedHTMLElement{
       let pathIndex = (index || hasFollowingSiblings ? "[" + (index + 1) + "]" : "");
       paths.splice(0, 0, tagName + pathIndex);
     }
-
-    console.log('paths', paths)
-
     return paths.length ? "/" + paths.join("/") : null;
-  };
-
-  function _buildElement(el:HTMLElement, parentId:string){
-    const PP_MEDIA_ATTRIBUTES = [
-      'id', 'className', 'title'
-    ];
-    const PREFERRED_PLAY_VALUES = [
-      'stopped'
-    ];
-    const PREFERRED_PAUSE_VALUES = [
-      'playing'
-    ];
-    const PREFERRED_GENERAL_VALUES = [
-      'playcontrol'
-    ];
-    const IGNORED_VALUES = [
-      'playlist', 'player', 'volume', 'open'
-    ];
-    const PP_SCORE = 1;
-
-    let _el = {
-      element: el,
-      path: el.className && el.className.replace ? '.' + el.className.replace(/ /g,'.') : '',
-      className: el.className,
-      id: el.id,
-      playButtonScore: 0,
-      pauseButtonScore: 0,
-      isPlayButton: false,
-      isPauseButton: false,
-      isOtherMediaControl: false,
-      parentId: parentId || undefined
-    };
-
-    PP_MEDIA_ATTRIBUTES.forEach(attr => {
-      if(el[attr] && el[attr].indexOf){
-        const EL_ATTR = el[attr].toLowerCase();
-        if (EL_ATTR.indexOf('play') > -1) {
-          _el.playButtonScore += PP_SCORE
-          _el.isPlayButton = true;
-
-          PREFERRED_GENERAL_VALUES.forEach(val => {
-            if(EL_ATTR.indexOf(val) > -1){
-              _el.playButtonScore += PP_SCORE;
-            }
-          })
-        }
-
-        if (EL_ATTR.indexOf('stop') > -1 || EL_ATTR.indexOf('pause') > -1) {
-          _el.pauseButtonScore += PP_SCORE;
-          _el.isPauseButton = true;
-        }
-
-        IGNORED_VALUES.forEach(val => {
-          if(EL_ATTR.indexOf(val) > -1){
-            _el.isOtherMediaControl = true;
-          }
-        })
-      }
-    });
-
-    if (el.nodeName === 'BUTTON') {
-      if(_el.isPlayButton){
-        _el.playButtonScore += PP_SCORE
-      }
-      if(_el.isPauseButton){
-        _el.pauseButtonScore += PP_SCORE
-      }
-    }
-
-    return _el
   }
 
   function _getButtonCandidates(elements?:any, old?:Array<any>, parentXpath?:string): RatedHTMLElement[]{
     const IGNORED_NODE_TYPES = ['A'];
+    const IGNORED_IFRAMES = ['js-player'];
     let _elements = elements || document.querySelectorAll('*');
     let _old = old || [];
     let _parentXpath = parentXpath || null;
 
     [].forEach.call(_elements, (el:any) => {
-      if (el.nodeName === 'IFRAME'){
+      if (el.nodeName === 'IFRAME' && !IGNORED_IFRAMES.some(val => el.className.indexOf(val) > 0)){
         try{
           if(el && el.contentDocument){
             _old = _getButtonCandidates(el.contentDocument.querySelectorAll('*'), _old, _getElementXPath(el))
@@ -254,12 +213,12 @@ class RatedHTMLElement implements iRatedHTMLElement{
         return siblings.className == candidate.className
       });
 
-      candidate.numberOfSiblings = identicalCandidates.length;
+      candidate.numberOfTwins = identicalCandidates.length;
     });
 
     return buttonCandidates.sort((a, b) => {
       if((b.playButtonScore + b.pauseButtonScore) == (a.playButtonScore + a.pauseButtonScore)){
-        return a.numberOfSiblings - b.numberOfSiblings
+        return a.numberOfTwins - b.numberOfTwins
       }
       return (b.playButtonScore + b.pauseButtonScore) - (a.playButtonScore + a.pauseButtonScore)
     });
@@ -277,7 +236,6 @@ class RatedHTMLElement implements iRatedHTMLElement{
     },
 
     getTestableButtonCandidates: (id:string) => {
-      console.log(id);
       let buttonCandidates = _getButtonCandidates();
 
       let playButtonsCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isPlayButton));

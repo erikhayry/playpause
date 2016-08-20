@@ -60,7 +60,42 @@ import {PPWindow} from "../../domain/window";
               </tr>
               </table>
             </div>
-
+            <div *ngIf="result[station.id].pauseButtonsCandidates && result[station.id].pauseButtonsCandidates.length > 0">
+              <h3>Pause Button ({{result[station.id].pauseButtonsCandidates[0].pauseButtonScore}})</h3>
+              <table class="table table-striped">
+              <tr>
+              <th>type</th>
+              <th>expected</th>
+              <th>result</th>
+              </tr>
+              <tr *ngIf="result[station.id].pauseButtonsCandidates[0].className" 
+                [ngClass]="result[station.id].pauseButtonsCandidates[0].className == station.buttons.pause.className ? 'text-success' : 'text-danger'">
+              <td>className</td>
+              <td>{{station.buttons.pause.className}}</td>
+              <td>{{result[station.id].pauseButtonsCandidates[0].className}}</td>
+              </tr>
+              <tr *ngIf="result[station.id].pauseButtonsCandidates[0].id" [ngClass]="result[station.id].pauseButtonsCandidates[0].id == station.buttons.pause.id ? 'text-success' : 'text-danger'">
+              <td>id</td>
+              <td>{{station.buttons.pause.id}}</td>
+              <td>{{result[station.id].pauseButtonsCandidates[0].id}}</td>
+              </tr>
+              <tr *ngIf="station.buttons.pause.xpath" 
+                [ngClass]="result[station.id].pauseButtonsCandidates[0].xpath == 
+                (station.buttons.pause.parentXpath ? station.buttons.pause.parentXpath + '+' : '') + station.buttons.pause.xpath ? 'text-success' : 'text-danger'">
+              <td>xpath</td>
+              <td>{{station.buttons.pause.xpath}}</td>
+              
+              <td *ngIf="result[station.id].pauseButtonsCandidates[0].parentXpath"
+              [ngClass]="station.buttons.pause.xpath == result[station.id].pauseButtonsCandidates[0].parentXpath + '+' + result[station.id].pauseButtonsCandidates[0].xpath ? 'text-success' : 'text-danger'">
+                {{result[station.id].pauseButtonsCandidates[0].parentXpath}}+{{result[station.id].pauseButtonsCandidates[0].xpath}}
+              </td>
+              <td *ngIf="!result[station.id].pauseButtonsCandidates[0].parentXpath"
+              [ngClass]="result[station.id].pauseButtonsCandidates[0].xpath == station.buttons.pause.xpath ? 'text-success' : 'text-danger'">
+                {{result[station.id].pauseButtonsCandidates[0].xpath}}
+              </td>
+              </tr>
+              </table>
+            </div>
         </div>
        </div>
        <hr>
@@ -81,8 +116,8 @@ export class TesterComponent {
           id: 'btn-play'
         },
         pause: {
-          xpath: '//*[@id="btn-stop"]',
-          id: 'btn-stop'
+          xpath: '//*[@id="btn-pause"]',
+          id: 'btn-pause'
         }
       }
     },
@@ -109,8 +144,8 @@ export class TesterComponent {
           className: 'player-play player-play--small'
         },
         pause: {
-          xpath: '//*[@id="player-container"]/div/div[1]/div/div[1]/button',
-          className: 'player-play th-p3-bg-color player-play--is-playing player-play--small'
+          xpath: '/html/body/div[7]/div/div[1]/div/div[1]/button/span',
+          className: 'player-play__stop player-play--active' //TODO get parent if button
         }
       }
     },
@@ -125,7 +160,8 @@ export class TesterComponent {
         },
         pause: {
           xpath: '//*[@id="player-bar-play-pause"]',
-          id: 'player-bar-play-pause'
+          id: 'player-bar-play-pause',
+          className: 'x-scope paper-icon-button-0'
         }
       }
     },
@@ -165,11 +201,12 @@ export class TesterComponent {
       url: 'http://tunein.com/radio/Bandit-Rock-1065-s15426',
       buttons: {
         play: {
-          className: 'play-button',
-          xpath: '//*[@id="app-player"]+//*[@id="play-pause"]',
+          className: 'playbutton-cont col',
+          xpath: '/html/body/div[3]/div/div/div[1]',
         },
         pause: {
-          xpath: '//*[@id="app-player"]//*[@id="play-pause"]',
+          className: 'playbutton-cont col',
+          xpath: '/html/body/div[3]/div/div/div[1]'
         }
       }
     }
@@ -205,9 +242,9 @@ export class TesterComponent {
       console.log(res.id);
       console.log(res.buttons);
       this.result[res.id] = {
-        playButtonsCandidates: res.buttons.playButtonsCandidates
+        playButtonsCandidates: res.buttons.playButtonsCandidates.length > 0 ? res.buttons.playButtonsCandidates : res.buttons.pauseButtonsCandidates,
+        pauseButtonsCandidates: res.buttons.pauseButtonsCandidates.length > 0 ? res.buttons.pauseButtonsCandidates : res.buttons.playButtonsCandidates
       };
-      console.log(this.result[res.id])
     });
   }
 }

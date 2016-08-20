@@ -9,5 +9,5 @@ export interface iRatedHTMLElement{
   isPauseButton:boolean;
   parentXpath:string;
   xpath:string;
-  numberOfSiblings: number;
+  numberOfTwins: number;
 }
