@@ -4,7 +4,6 @@ import {iRatedHTMLElement} from "../domain/iRatedHTMLElement";
 
 class RatedHTMLElement implements iRatedHTMLElement{
   element:HTMLElement;
-  path:string;
   className:string;
   id:string;
   title:string;
@@ -80,7 +79,7 @@ class RatedHTMLElement implements iRatedHTMLElement{
     const OTHER_MEDIA_VALUES = [
       'volume', 'next', 'previous', 'stop', 'pause', 'artwork', 'srcubber', 'info', 'skip', 'repeat',
       'rewind', 'forward', 'shuffle', 'queue', 'timeline', 'progress', 'cover', 'cover-art', 'track',
-    ];
+    ]; //TODO go one level up, set max value?
 
     let siblings = element.parentNode.childNodes;
 
@@ -127,47 +126,6 @@ class RatedHTMLElement implements iRatedHTMLElement{
   const LOG = 'color: orange; font-weight: bold;';
   console.log('%c render on guest', LOG);
 
-   function _getElementXPath(element:HTMLElement){
-    console.log('_getElementXPath');
-    if (element && element.id)
-      return '//*[@id="' + element.id + '"]';
-    else
-      return _getElementTreeXPath(element);
-  };
-
-  function _getElementTreeXPath(element:HTMLElement){
-    console.log('_getElementTreeXPath', element);
-    let paths:string[] = [];
-
-    // Use nodeName (instead of localName) so namespace prefix is included (if any).
-    for (; element && element.nodeType == Node.ELEMENT_NODE; element = (<HTMLElement>element.parentNode))
-    {
-      let index = 0;
-      let hasFollowingSiblings = false;
-      for (let sibling = element.previousSibling; sibling; sibling = sibling.previousSibling)
-      {
-        // Ignore document type declaration.
-        if (sibling.nodeType == Node.DOCUMENT_TYPE_NODE)
-          continue;
-
-        if (sibling.nodeName == element.nodeName)
-          ++index;
-      }
-
-      for (let sibling = element.nextSibling; sibling && !hasFollowingSiblings;
-           sibling = sibling.nextSibling)
-      {
-        if (sibling.nodeName == element.nodeName)
-          hasFollowingSiblings = true;
-      }
-
-      let tagName = (element.prefix ? element.prefix + ":" : "") + element.localName;
-      let pathIndex = (index || hasFollowingSiblings ? "[" + (index + 1) + "]" : "");
-      paths.splice(0, 0, tagName + pathIndex);
-    }
-    return paths.length ? "/" + paths.join("/") : null;
-  }
-
   function _getButtonCandidates(elements?:any, old?:Array<any>, parentXpath?:string): RatedHTMLElement[]{
     const IGNORED_NODE_TYPES = ['A'];
     const IGNORED_IFRAMES = ['js-player'];
@@ -179,7 +137,7 @@ class RatedHTMLElement implements iRatedHTMLElement{
       if (el.nodeName === 'IFRAME' && !IGNORED_IFRAMES.some(val => el.className.indexOf(val) > 0)){
         try{
           if(el && el.contentDocument){
-            _old = _getButtonCandidates(el.contentDocument.querySelectorAll('*'), _old, _getElementXPath(el))
+            _old = _getButtonCandidates(el.contentDocument.querySelectorAll('*'), _old, (<PPWindow>window).PP_XPATH.getElementXPath(el))
           }
         }
         catch(e){
@@ -198,12 +156,17 @@ class RatedHTMLElement implements iRatedHTMLElement{
   }
 
   function _getElementQuery(path:StationButtonPath):HTMLElement{
+    console.log('_getElementQuery', path);
     if(path.type === 'selector'){
-      return (<HTMLElement>document.querySelectorAll(path.value)[0])
+      console.log((<PPWindow>window).PP_XPATH.getElementsByXPath(document, path.value));
+      return (<HTMLElement>(<PPWindow>window).PP_XPATH.getElementsByXPath(document, path.value)[0])
     }
+
+    //TODO use parent value instead of split
     if(path.type === 'iframe'){
-      let _paths = path.value.split(',');
-      return window.frames[_paths[0]].contentDocument.querySelectorAll(_paths[1])[0]
+      let _paths = path.value.split('+');
+      let _iFrameEl = (<PPWindow>window).PP_XPATH.getElementsByXPath(document, _paths[0])[0];
+      return (<PPWindow>window).PP_XPATH.getElementsByXPath(_iFrameEl.contentDocument, _paths[1])[0];
     }
   }
 
@@ -232,7 +195,24 @@ class RatedHTMLElement implements iRatedHTMLElement{
 
     getButtonCandidates: () => {
       let buttonCandidates = _getButtonCandidates();
-      (<PPWindow>window).electronSafeIpc.send('buttonCandidatesFetched', buttonCandidates);
+
+      let playButtonsCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isPlayButton));
+      if(playButtonsCandidates.length > 0){
+        playButtonsCandidates[0].xpath = (<PPWindow>window).PP_XPATH.getElementXPath(playButtonsCandidates[0].element)
+      }
+
+      let pauseButtonsCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isPauseButton));
+      if(pauseButtonsCandidates.length > 0){
+        pauseButtonsCandidates[0].xpath = (<PPWindow>window).PP_XPATH.getElementXPath(pauseButtonsCandidates[0].element)
+      }
+
+      playButtonsCandidates.forEach(el => delete el['element']);
+      pauseButtonsCandidates.forEach(el => delete el['element']);
+
+      (<PPWindow>window).electronSafeIpc.send('buttonCandidatesFetched', {
+        playButtonsCandidates: playButtonsCandidates,
+        pauseButtonsCandidates: pauseButtonsCandidates,
+      });
     },
 
     getTestableButtonCandidates: (id:string) => {
@@ -240,12 +220,12 @@ class RatedHTMLElement implements iRatedHTMLElement{
 
       let playButtonsCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isPlayButton));
       if(playButtonsCandidates.length > 0){
-        playButtonsCandidates[0].xpath = _getElementXPath(playButtonsCandidates[0].element)
+        playButtonsCandidates[0].xpath = (<PPWindow>window).PP_XPATH.getElementXPath(playButtonsCandidates[0].element)
       }
 
       let pauseButtonsCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isPauseButton));
       if(pauseButtonsCandidates.length > 0){
-        pauseButtonsCandidates[0].xpath = _getElementXPath(pauseButtonsCandidates[0].element)
+        pauseButtonsCandidates[0].xpath = (<PPWindow>window).PP_XPATH.getElementXPath(pauseButtonsCandidates[0].element)
       }
 
       playButtonsCandidates.forEach(el => delete el['element']);
@@ -258,9 +238,13 @@ class RatedHTMLElement implements iRatedHTMLElement{
     },
 
     getPlayerState: (playBtnObj:StationButtonPath, pauseBtnObj:StationButtonPath) => {
+      let _playButtonEl = _getElementQuery(playBtnObj);
+      let _pauseButtonEl = _getElementQuery(playBtnObj);
+      console.log('getPlayerState', _playButtonEl, _pauseButtonEl);
+
       (<PPWindow>window).electronSafeIpc.send("buttonStylesFetched", {
-        playBtnStyle:window.getComputedStyle(_getElementQuery(playBtnObj)),
-        pauseBtnStyle: window.getComputedStyle(_getElementQuery(pauseBtnObj))
+        playBtnStyle: _playButtonEl ? window.getComputedStyle(_playButtonEl) : null,
+        pauseBtnStyle: _pauseButtonEl ? window.getComputedStyle(_pauseButtonEl) : null
       })
     },
 

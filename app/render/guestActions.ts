@@ -34,7 +34,7 @@ export module GuestActions{
   }
 
   export function getTestableButtonCandidates(id:string, webview:WebViewElement):Promise<any[]>{
-    console.log(id)
+    console.log(id);
     webview.executeJavaScript(`PP_EP.getTestableButtonCandidates(${JSON.stringify(id)})`);
 
     return new Promise<any>((resolve, reject) => {

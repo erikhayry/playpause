@@ -18,10 +18,10 @@ import {RenderComponent} from "./render.component";
       
       <hr>
       
-      <p>Play buttons path: <span *ngIf="playButton">{{playButton.path}}</span></p>
-      <p>Pause buttons path: <span *ngIf="pauseButton">{{pauseButton.path}}</span></p>
+      <p>Play buttons path: <span *ngIf="playButton">{{playButton.xpath}}</span></p>
+      <p>Pause buttons path: <span *ngIf="pauseButton">{{pauseButton.xpath}}</span></p>
       
-      <button *ngIf="url && playButton && pauseButton && !added" class="btn btn-block btn-primary" (click)="addStation(url, url, playButton.path, pauseButton.path)">Add</button>
+      <button *ngIf="url && playButton && pauseButton && !added" class="btn btn-block btn-primary" (click)="addStation(url, url, playButton.xpath, pauseButton.xpath)">Add</button>
       
       <div *ngIf="added">
         <p>Stations added</p>
@@ -58,10 +58,10 @@ export class AddStationComponent extends RenderComponent{
   domReady():void{
     this.logger.log('domReady');
     var stationCandidate = this.render.buildStationCandidate(this.guest);
-    stationCandidate.getButtonCandidates().then((buttons:Array<any>) => {
-      this.logger.log('render on onButtonCandidatesFetched', buttons);
-      this.playButton = buttons.find(button => button.isPlayButton);
-      this.pauseButton = buttons.find(button => button.isPauseButton) || this.playButton;
+    stationCandidate.getButtonCandidates().then((buttons:any) => {
+      this.logger.log('render on onButtonCandidatesFetched', buttons.playButtonsCandidates);
+      this.playButton = buttons.playButtonsCandidates.length > 0 ? buttons.playButtonsCandidates[0] : buttons.pauseButtonsCandidates[0];
+      this.pauseButton = buttons.playButtonsCandidates.length > 0 ? buttons.playButtonsCandidates[0] : this.playButton;
     });
 
     this.guest.openDevTools();

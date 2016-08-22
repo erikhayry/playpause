@@ -33,11 +33,11 @@ export module DB{
     buttons: {
       play: {
         type: 'selector',
-        value: 'button.playControl'
+        value: '/html/body/div[1]/div[4]/div/div/ul/li[1]/button[2]'
       },
       pause: {
         type: 'selector',
-        value: 'button.playControl'
+        value: '/html/body/div[1]/div[4]/div/div/ul/li[1]/button[2]'
       }
     }
   });
@@ -48,12 +48,12 @@ export module DB{
       play:
       {
         type: 'selector',
-        value: '#btn-play'
+        value: '//*[@id="btn-play"]'
       },
       pause:
       {
         type: 'selector',
-        value: '#btn-stop'
+        value: '//*[@id="btn-pause"]'
       }
 
     }
@@ -64,11 +64,11 @@ export module DB{
     buttons: {
       play: {
         type: 'iframe',
-        value: 'app-player,#play-pause'
+        value: '//*[@id="app-player"]+//*[@id="play-pause"]'
       },
       pause: {
         type: 'iframe',
-        value: 'app-player,#play-pause'
+        value: '//*[@id="app-player"]+//*[@id="play-pause"]'
       }
     }
   });

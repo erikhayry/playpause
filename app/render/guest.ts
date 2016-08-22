@@ -19,6 +19,7 @@ export abstract class Guest{
 
     this.webview.executeJavaScript(fs.readFileSync(root + '/app/guest/lib/electronSafeIpc.js').toString());
     this.webview.executeJavaScript(fs.readFileSync(root + '/app/guest/guest-utils.js').toString());
+    this.webview.executeJavaScript(fs.readFileSync(root + '/app/guest/xpath-utils.js').toString());
   }
 
   on = (topic:string, listener:any) =>{

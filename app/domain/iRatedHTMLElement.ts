@@ -1,6 +1,5 @@
 export interface iRatedHTMLElement{
   element:HTMLElement;
-  path:string;
   className:string;
   id:string;
   playButtonScore:number;

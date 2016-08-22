@@ -16,6 +16,8 @@
 
     //TODO types for state. Enum?
     private onGuestStyleFetched = (state:string):void => {
+      this.logger.log('onGuestStyleFetched', state);
+
       switch (state) {
         case 'playing':
           GuestActions.click(this.webview, this.station.buttons.pause);
@@ -27,6 +29,7 @@
     };
 
     playPause():void {
+      this.logger.log('playPause');
       if (this.station && this.station.buttons.play !== this.station.buttons.pause) {
         GuestActions.getGuestState(this.webview, this.station)
           .then(this.onGuestStyleFetched)
