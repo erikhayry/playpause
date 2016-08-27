@@ -11,6 +11,7 @@ class RatedHTMLElement implements iRatedHTMLElement{
   pauseButtonScore = 0;
   isPlayButton = false;
   isPauseButton = false;
+  isAudio = false;
   parentXpath:string;
   xpath:string;
   nodeName:string;
@@ -27,7 +28,8 @@ class RatedHTMLElement implements iRatedHTMLElement{
     if(!this.isOtherMediaControl(this.element)){
       this.setButtonType(this.element);
 
-      if(this.isPlayButton || this.isPauseButton){
+      if(this.isAudio || this.isPlayButton || this.isPauseButton){
+        this.checkAudioEl(this.element, 10000);
         this.checkSiblings(this.element, 1000);
         this.checkNodeName(this.element, 100);
         this.checkAttributes(this.element, 100);
@@ -55,6 +57,8 @@ class RatedHTMLElement implements iRatedHTMLElement{
   }
 
   private setButtonType(element:HTMLElement):void{
+    this.isAudio = element.nodeName == 'AUDIO';
+
     this.isPlayButton = this._PP_MEDIA_ATTRIBUTES.some(attr => {
       if(element.parentNode.nodeName == 'BUTTON' || element.getElementsByTagName('button').length != 0){
         return false
@@ -67,7 +71,7 @@ class RatedHTMLElement implements iRatedHTMLElement{
        }
     });
 
-    this.isPauseButton = this._PP_MEDIA_ATTRIBUTES.some(attr => {
+    this.isPauseButton =  this._PP_MEDIA_ATTRIBUTES.some(attr => {
       if(element[attr] && element[attr].indexOf){
         const EL_ATTR = element[attr].toLowerCase();
         return (EL_ATTR.indexOf('stop') > -1 || EL_ATTR.indexOf('pause') > -1)
@@ -108,6 +112,14 @@ class RatedHTMLElement implements iRatedHTMLElement{
         this.pauseButtonScore += (EL_ATTR.match(/pause/g) || []).length * score;
       }
     });
+  }
+
+  private checkAudioEl(element:HTMLElement, score:number){
+    if(this.isAudio){
+      console.log(element);
+      this.playButtonScore += score;
+      this.pauseButtonScore += score;
+    }
   }
 
   private checkNodeName(element:HTMLElement, score:number){
@@ -151,7 +163,7 @@ class RatedHTMLElement implements iRatedHTMLElement{
 
     });
 
-    return _old.filter((el) => el.isPlayButton || el.isPauseButton)
+    return _old.filter((el) => el.isAudio || el.isPlayButton || el.isPauseButton)
       .sort((a,b) => (b.playButtonScore + b.pauseButtonScore) - (a.playButtonScore + a.pauseButtonScore));
   }
 
@@ -206,12 +218,19 @@ class RatedHTMLElement implements iRatedHTMLElement{
         pauseButtonsCandidates[0].xpath = (<PPWindow>window).PP_XPATH.getElementXPath(pauseButtonsCandidates[0].element)
       }
 
+      let audioCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isAudio));
+      if(audioCandidates.length > 0){
+        audioCandidates[0].xpath = (<PPWindow>window).PP_XPATH.getElementXPath(audioCandidates[0].element)
+      }
+
       playButtonsCandidates.forEach(el => delete el['element']);
       pauseButtonsCandidates.forEach(el => delete el['element']);
+      audioCandidates.forEach(el => delete el['element']);
 
       (<PPWindow>window).electronSafeIpc.send('buttonCandidatesFetched', {
         playButtonsCandidates: playButtonsCandidates,
         pauseButtonsCandidates: pauseButtonsCandidates,
+        audioCandidates: audioCandidates,
       });
     },
 
@@ -228,12 +247,19 @@ class RatedHTMLElement implements iRatedHTMLElement{
         pauseButtonsCandidates[0].xpath = (<PPWindow>window).PP_XPATH.getElementXPath(pauseButtonsCandidates[0].element)
       }
 
+      let audioCandidates = _sortByUniqueness(buttonCandidates.filter((button) => button.isAudio));
+      if(audioCandidates.length > 0){
+        audioCandidates[0].xpath = (<PPWindow>window).PP_XPATH.getElementXPath(audioCandidates[0].element)
+      }
+
       playButtonsCandidates.forEach(el => delete el['element']);
       pauseButtonsCandidates.forEach(el => delete el['element']);
+      audioCandidates.forEach(el => delete el['element']);
 
       (<PPWindow>window).electronSafeIpc.send('testableButtonCandidatesFetched'+id, {
         playButtonsCandidates: playButtonsCandidates,
         pauseButtonsCandidates: pauseButtonsCandidates,
+        audioCandidates: audioCandidates,
       });
     },
 

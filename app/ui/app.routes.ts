@@ -6,7 +6,7 @@ import {TesterComponent} from "./views/tester.component";
 export const routes: RouterConfig = [
   {
     path: '',
-    redirectTo: '/play-station',
+    redirectTo: '/tester',
     pathMatch: 'full'
   },
   { path: 'play-station', component: RadioComponent },

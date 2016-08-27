@@ -149,6 +149,21 @@ export class TesterComponent {
         }
       }
     },
+/*    {
+      id: 'sr (iPad)',
+      userAgent: 'Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
+      url: 'http://sverigesradio.se',
+      buttons: {
+        play: {
+          xpath: '/html/body/div[7]/div/div[1]/div/div[1]/button',
+          className: 'player-play player-play--small'
+        },
+        pause: {
+          xpath: '/html/body/div[7]/div/div[1]/div/div[1]/button/span',
+          className: 'player-play__stop player-play--active' //TODO get parent if button
+        }
+      }
+    },*/
     {
       id: 'google',
       url: 'https://play.google.com/music/listen?authuser#/now',
@@ -230,6 +245,9 @@ export class TesterComponent {
     this.stations.forEach(station => {
       let webview = (<WebViewElement>document.getElementById(station.id));
       webview.src = station.url;
+      if(station.userAgent){
+        webview.useragent = station.userAgent
+      }
       webview.addEventListener('dom-ready', (e:WebViewElementEvent) => this.domReady(station.id, webview));
     })
   }

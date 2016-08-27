@@ -157,8 +157,8 @@ import {PPWindow} from "app/domain/window";
     }
   };
 
-  function _evaluateXPath(doc, xpath, contextNode, resultType)
-  {
+  function _evaluateXPath(doc, xpath, contextNode, resultType){
+    console.log('_evaluateXPath', doc, xpath, contextNode, resultType);
     if (contextNode === undefined)
       contextNode = doc;
 
@@ -167,8 +167,7 @@ import {PPWindow} from "app/domain/window";
 
     var result = doc.evaluate(xpath, contextNode, null, resultType, null);
 
-    switch (result.resultType)
-    {
+    switch (result.resultType){
       case XPathResult.NUMBER_TYPE:
         return result.numberValue;
 
