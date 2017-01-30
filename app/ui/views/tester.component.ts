@@ -110,6 +110,8 @@ export class TesterComponent {
     {
       id: 'bbc',
       url: 'https://www.bbc.co.uk/radio/player/bbc_6music',
+      //userAgent: 'Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1', //TODO spoof
+      userAgent: '',
       buttons: {
         play: {
           xpath: '//*[@id="btn-play"]',
@@ -226,7 +228,6 @@ export class TesterComponent {
       }
     }
 
-      //http://tunein.com/radio/Bandit-Rock-1065-s15426/
       //'http://www.radio.org.se/',
       //'http://www.playradio.se/',
       //'http://www.internet-radio.com/station/dougeasyhits/',
